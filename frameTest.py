@@ -17,7 +17,7 @@ def init_db():
 class WelcomeWindow(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Welcome to App")
+        self.title("Let's GO Ride With Us")
         self.geometry("400x300")
         self.configure(bg="#f4f4f4")  # Light grey background
 
