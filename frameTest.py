@@ -14,20 +14,26 @@ def init_db():
         cursor = conn.cursor()
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS riders (
-            username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
-        );
-        ''')
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        otp TEXT,
+        phone_number TEXT,
+        phone_extension TEXT
+    );
+    ''')
 
     # Initialize the passengers database
     with sqlite3.connect(PASSENGERS_DB) as conn:
         cursor = conn.cursor()
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS passengers (
-            username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
-        );
-        ''')
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        otp TEXT,
+        phone_number TEXT,
+        phone_extension TEXT
+    );
+    ''')
 
 class WelcomeWindow(tk.Tk):
     def __init__(self):
@@ -96,6 +102,20 @@ class WelcomeWindow(tk.Tk):
         self.rider_password_entry = ttk.Entry(self.rider_frame, show="*")
         self.rider_password_entry.pack(pady=10)
 
+
+
+        phone_extensions = ["+1", "+44", "+91", "+33"]  # Example extensions, you can add more
+
+        self.passenger_password_label = ttk.Label(self.rider_frame, text="Rider Phone Number:")
+        self.passenger_password_label.pack(pady=10)
+
+        self.rider_phone_extension_combobox = ttk.Combobox(self.rider_frame, values=phone_extensions)
+        self.rider_phone_extension_combobox.pack(pady=10)
+        self.rider_phone_extension_combobox.set(phone_extensions[0])  # Set default value
+
+        self.rider_phone_number_entry = ttk.Entry(self.rider_frame)
+        self.rider_phone_number_entry.pack(pady=10)
+
         self.rider_register_btn = ttk.Button(self.rider_frame, text="Register as Rider", command=self.register_user)  # You can customize the command for rider-specific registration
         self.rider_register_btn.pack(pady=10)
 
@@ -115,6 +135,16 @@ class WelcomeWindow(tk.Tk):
 
         self.passenger_password_entry = ttk.Entry(self.passenger_frame, show="*")
         self.passenger_password_entry.pack(pady=10)
+
+        self.passenger_password_label = ttk.Label(self.passenger_frame, text="Passenger Phone Number:")
+        self.passenger_password_label.pack(pady=10)
+        
+        self.passenger_phone_extension_combobox = ttk.Combobox(self.passenger_frame, values=phone_extensions)
+        self.passenger_phone_extension_combobox.pack(pady=10)
+        self.passenger_phone_extension_combobox.set(phone_extensions[0])  # Set default value
+
+        self.passenger_phone_number_entry = ttk.Entry(self.passenger_frame)
+        self.passenger_phone_number_entry.pack(pady=10)
 
         self.passenger_register_btn = ttk.Button(self.passenger_frame, text="Register as Passenger", command=self.register_user)  # You can customize the command for passenger-specific registration
         self.passenger_register_btn.pack(pady=10)
@@ -165,11 +195,15 @@ class WelcomeWindow(tk.Tk):
         if current_tab == "Rider":
             username = self.rider_username_entry.get()
             password = self.rider_password_entry.get()
+            phone_extension = self.rider_phone_extension_combobox.get()
+            phone_number = self.rider_phone_number_entry.get()
             db_path = RIDERS_DB
             table_name = "riders"
         elif current_tab == "Passenger":
             username = self.passenger_username_entry.get()
             password = self.passenger_password_entry.get()
+            phone_extension = self.passenger_phone_extension_combobox.get()
+            phone_number = self.passenger_phone_number_entry.get()
             db_path = PASSENGERS_DB
             table_name = "passengers"
         else:
@@ -182,7 +216,8 @@ class WelcomeWindow(tk.Tk):
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             try:
-                cursor.execute(f"INSERT INTO {table_name} (username, password) VALUES (?, ?)", (username, password))
+                cursor.execute(f"INSERT INTO {table_name} (username, password, phone_extension, phone_number) VALUES (?, ?, ?, ?)", 
+                            (username, password, phone_extension, phone_number))
                 messagebox.showinfo("Success", f"Registered Successfully as {current_tab}!")
             except sqlite3.IntegrityError:
                 messagebox.showerror("Error", f"{current_tab} Username already exists!")
