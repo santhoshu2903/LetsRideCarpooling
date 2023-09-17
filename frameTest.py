@@ -33,7 +33,7 @@ class WelcomeWindow(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Let's GO Ride With Us")
-        self.geometry("400x300")
+        self.geometry("500x400")
         self.configure(bg="#f4f4f4")  # Light grey background
 
         style = ttk.Style()
