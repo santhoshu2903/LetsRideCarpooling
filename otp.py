@@ -8,7 +8,7 @@ from twilio.rest import Client
 def send_sms(phone_number, message):
     # Your Twilio account SID and Auth Token
     account_sid = 'ACd607e2f86a57f692c81867be2f0b351f'
-    auth_token = '8ee8f3b5ce7f516bfde81a6a166fd35b'
+    auth_token = 'acda06ff971cc152136b2355c24b9a11'
     client = Client(account_sid, auth_token)
 
     # Your Twilio phone number

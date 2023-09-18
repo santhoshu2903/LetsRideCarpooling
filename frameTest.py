@@ -1,8 +1,12 @@
+import random
 import tkinter as tk
 from tkinter import ttk, messagebox
+from twilio.rest import Client
 import sqlite3
 import os
 
+
+#DATABASE_DB = "/Database/passengers.db"
 
 DATABASE_DIR = os.path.join(os.getcwd(), "Database")
 RIDERS_DB = os.path.join(DATABASE_DIR, "riders.db")
@@ -63,24 +67,34 @@ class WelcomeWindow(tk.Tk):
     def show_login(self):
         self.clear_content()
 
-        self.username_label = ttk.Label(self, text="Username:")
-        self.username_label.pack(pady=10)
+        phone_extensions = ["+1", "+44", "+91", "+33"]  # Example extensions, add as needed
 
-        self.username_entry = ttk.Entry(self)
-        self.username_entry.pack(pady=10)
-        self.username_entry.focus_set()
+        self.phone_extension_combobox = ttk.Combobox(self, values=phone_extensions)
+        self.phone_extension_combobox.pack(pady=10)
+        self.phone_extension_combobox.set(phone_extensions[0])  # Set default value
 
-        self.password_label = ttk.Label(self, text="Password:")
-        self.password_label.pack(pady=10)
+        self.phone_number_label = ttk.Label(self, text="Phone Number:")
+        self.phone_number_label.pack(pady=10)
 
-        self.password_entry = ttk.Entry(self, show="*")
-        self.password_entry.pack(pady=10)
+        self.phone_number_entry = ttk.Entry(self)
+        self.phone_number_entry.pack(pady=10)
+        self.phone_number_entry.focus_set()
+
+        self.otp_label = ttk.Label(self, text="OTP:")
+        self.otp_label.pack(pady=10)
+
+        self.otp_entry = ttk.Entry(self)
+        self.otp_entry.pack(pady=10)
+
+        self.send_otp_btn = ttk.Button(self, text="Send OTP", command=self.send_otp)
+        self.send_otp_btn.pack(pady=10)
 
         self.login_btn = ttk.Button(self, text="Login", command=self.login_user)
         self.login_btn.pack(pady=10)
 
         self.back_btn = ttk.Button(self, text="Back", command=self.show_welcome)
         self.back_btn.pack(pady=10)
+
 
     def show_register(self):
         self.clear_content()
@@ -162,31 +176,32 @@ class WelcomeWindow(tk.Tk):
             widget.destroy()
 
     def login_user(self):
-        username = self.username_entry.get()
-        password = self.password_entry.get()
+        phone_extension = self.phone_extension_combobox.get()
+        phone_number = self.phone_number_entry.get()
+        otp_entered = self.otp_entry.get()
 
-        if not username or not password:
+        if not phone_number or not otp_entered:
             messagebox.showerror("Error", "Both fields are required!")
             return
 
-        # Check credentials in the RIDERS_DB first
+        # Check OTP in the RIDERS_DB first
         with sqlite3.connect(RIDERS_DB) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM riders WHERE username=? AND password=?", (username, password))
+            cursor.execute("SELECT * FROM riders WHERE phone_extension=? AND phone_number=? AND otp=?", (phone_extension, phone_number, otp_entered))
             if cursor.fetchone():
                 messagebox.showinfo("Success", "Rider login successful!")
-                return  # Exit the method if found in RIDERS_DB
+                return  # Exit the method if OTP matches in RIDERS_DB
 
-        # Check credentials in the PASSENGERS_DB next
+        # Check OTP in the PASSENGERS_DB next
         with sqlite3.connect(PASSENGERS_DB) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM passengers WHERE username=? AND password=?", (username, password))
+            cursor.execute("SELECT * FROM passengers WHERE phone_extension=? AND phone_number=? AND otp=?", (phone_extension, phone_number, otp_entered))
             if cursor.fetchone():
                 messagebox.showinfo("Success", "Passenger login successful!")
-                return  # Exit the method if found in PASSENGERS_DB
+                return  # Exit the method if OTP matches in PASSENGERS_DB
 
         # If neither database has a match, display an error
-        messagebox.showerror("Error", "Invalid Username or Password!")
+        messagebox.showerror("Error", "Invalid OTP or Phone Number!")
 
 
     def register_user(self):
@@ -221,6 +236,36 @@ class WelcomeWindow(tk.Tk):
                 messagebox.showinfo("Success", f"Registered Successfully as {current_tab}!")
             except sqlite3.IntegrityError:
                 messagebox.showerror("Error", f"{current_tab} Username already exists!")
+
+    def send_otp(self):
+        phone_extension = self.phone_extension_combobox.get()
+        phone_number = phone_extension + self.phone_number_entry.get()
+
+        # Generate a random 6-digit OTP
+        self.otp_generated = str(random.randint(100000, 999999))
+
+        try:
+            # Send the OTP to the user's phone number using the send_sms function
+            send_sms(phone_number, f"Your OTP is: {self.otp_generated}")
+            messagebox.showinfo("Success", f"OTP sent to {phone_number}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Error sending OTP: {str(e)}")
+
+def send_sms(phone_number, message):
+    # Your Twilio account SID and Auth Token
+    account_sid = 'ACd607e2f86a57f692c81867be2f0b351f'
+    auth_token = 'acda06ff971cc152136b2355c24b9a11'
+    client = Client(account_sid, auth_token)
+
+    # Your Twilio phone number
+    twilio_phone_number = '+18449584452'
+    message = client.messages.create(
+        to=phone_number,
+        from_=twilio_phone_number,
+        body=message
+    )
+    return message.sid
+
 
 
 if __name__ == "__main__":
