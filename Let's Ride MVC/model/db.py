@@ -4,18 +4,19 @@ RIDERS_DB = "riders.db"
 PASSENGERS_DB = "passengers.db"
 
 def init_dbs():
-    init_db(RIDERS_DB, "rider")
-    init_db(PASSENGERS_DB, "passenger")
+    init_db(RIDERS_DB)
+    init_db(PASSENGERS_DB)
 
-def init_db(db_name, role):
+def init_db(db_name):
     with sqlite3.connect(db_name) as conn:
         cursor = conn.cursor()
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
+            password TEXT NOT NULL,
+            role TEXT DEFAULT ''
         );
-        ''', (role,))
+        ''')
 
 
 def add_user_to_db(db_name, username, password):
