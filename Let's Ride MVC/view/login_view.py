@@ -1,8 +1,5 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import sqlite3
-import random
-from twilio.rest import Client  # Import Twilio library
 
 class LoginView(tk.Tk):
     def __init__(self, controller):
@@ -16,13 +13,9 @@ class LoginView(tk.Tk):
         style.configure("TButton", font=("Segoe UI", 10, "bold"), borderwidth=0)
         style.configure("TLabel", font=("Segoe UI", 12), background="#f4f4f4")
         style.configure("TEntry", font=("Segoe UI", 10))
-        self.show_login()
-
-    def show_login(self):
-        self.clear_content()
 
         self.phone_extensions = ["+1", "+44", "+91", "+33"]
-        
+
         self.phone_extension_combobox = ttk.Combobox(self, values=self.phone_extensions)
         self.phone_extension_combobox.pack(pady=10)
         self.phone_extension_combobox.set(self.phone_extensions[0])
@@ -40,10 +33,10 @@ class LoginView(tk.Tk):
         self.otp_entry = ttk.Entry(self)
         self.otp_entry.pack(pady=10)
 
-        self.send_otp_btn = ttk.Button(self, text="Send OTP", command=self.send_otp)
+        self.send_otp_btn = ttk.Button(self, text="Send OTP", command=self.controller.send_otp)
         self.send_otp_btn.pack(pady=10)
 
-        self.login_btn = ttk.Button(self, text="Login", command=self.login_user)
+        self.login_btn = ttk.Button(self, text="Login", command=self.controller.login_user)
         self.login_btn.pack(pady=10)
 
         self.back_btn = ttk.Button(self, text="Back", command=self.controller.show_welcome)
@@ -53,53 +46,6 @@ class LoginView(tk.Tk):
         for widget in self.winfo_children():
             widget.destroy()
 
-    def send_otp(self):
-        phone_extension = self.phone_extension_combobox.get()
-        phone_number = phone_extension + self.phone_number_entry.get()
-
-        # Generate a random 6-digit OTP
-        self.otp_generated = str(random.randint(100000, 999999))
-
-        try:
-            # Send the OTP to the user's phone number using the send_sms function
-            send_sms(phone_number, f"Your OTP is: {self.otp_generated}")
-            messagebox.showinfo("Success", f"OTP sent to {phone_number}")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error sending OTP: {str(e)}")
-
-    def login_user(self):
-        phone_extension = self.phone_extension_combobox.get()
-        phone_number = self.phone_number_entry.get()
-        otp_entered = self.otp_entry.get()
-
-        if not phone_number or not otp_entered:
-            messagebox.showerror("Error", "Both fields are required!")
-            return
-
-        # Check OTP entered by the user with the OTP generated earlier
-        if otp_entered == self.otp_generated:
-            messagebox.showinfo("Success", "Login successful!")
-        else:
-            messagebox.showerror("Error", "Invalid OTP!")
-
-def send_sms(phone_number, message):
-    # Your Twilio account SID and Auth Token
-    account_sid = 'your_account_sid_here'
-    auth_token = 'your_auth_token_here'
-
-    # Initialize the Twilio client
-    client = Client(account_sid, auth_token)
-
-    # Your Twilio phone number
-    twilio_phone_number = 'your_twilio_phone_number_here'
-
-    try:
-        # Send the SMS
-        message = client.messages.create(
-            to=phone_number,
-            from_=twilio_phone_number,
-            body=message
-        )
-        return message.sid
-    except Exception as e:
-        raise e
+if __name__ == "__main__":
+    app = LoginView(None)
+    app.mainloop()
