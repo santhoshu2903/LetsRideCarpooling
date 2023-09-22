@@ -32,8 +32,8 @@ def init_db():
         phone_extension TEXT
     );
     ''')
-
-    # Initialize the all users database( contains userid, phone number, and name)
+    
+    # Initialize the all users database
     with sqlite3.connect(ALL_USERS_DB) as conn:
         cursor = conn.cursor()
         cursor.execute('''
@@ -45,9 +45,5 @@ def init_db():
     );
     ''')
 
-def add_user_to_db(db_name, username, password, phone_extension, phone_number):
-    with sqlite3.connect(db_name) as conn:
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO users (username, password, phone_extension, phone_number) VALUES (?, ?, ?, ?)",
-                       (username, password, phone_extension, phone_number))
-        conn.commit()
+if __name__ == "__main__":
+    init_db()
