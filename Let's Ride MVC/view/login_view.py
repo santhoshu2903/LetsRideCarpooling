@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import sqlite3
 import random
+from twilio.rest import Client  # Import Twilio library
 
 class LoginView(tk.Tk):
     def __init__(self, controller):
@@ -82,4 +83,23 @@ class LoginView(tk.Tk):
             messagebox.showerror("Error", "Invalid OTP!")
 
 def send_sms(phone_number, message):
-    # Implement Twilio SMS sending logic here
+    # Your Twilio account SID and Auth Token
+    account_sid = 'your_account_sid_here'
+    auth_token = 'your_auth_token_here'
+
+    # Initialize the Twilio client
+    client = Client(account_sid, auth_token)
+
+    # Your Twilio phone number
+    twilio_phone_number = 'your_twilio_phone_number_here'
+
+    try:
+        # Send the SMS
+        message = client.messages.create(
+            to=phone_number,
+            from_=twilio_phone_number,
+            body=message
+        )
+        return message.sid
+    except Exception as e:
+        raise e

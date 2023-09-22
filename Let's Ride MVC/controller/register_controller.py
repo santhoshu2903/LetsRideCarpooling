@@ -1,5 +1,6 @@
 from view import register_view
 from model import db
+import sqlite3
 
 class RegisterController:
     def __init__(self):
@@ -9,5 +10,10 @@ class RegisterController:
         self.view.clear_content()
         self.view.show_register()
 
-    def register_user(self):
-        # Implement user registration logic here
+if __name__ == "__main__":
+    from model import db
+    from view import register_view
+    db.init_db()
+    
+    controller = RegisterController()
+    controller.view.mainloop()
