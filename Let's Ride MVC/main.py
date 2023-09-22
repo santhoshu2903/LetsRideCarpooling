@@ -1,5 +1,7 @@
-from controller import welcome_controller
+import tkinter as tk
+from controller.welcome_controller import WelcomeController
 
 if __name__ == "__main__":
-    app = welcome_controller.WelcomeController()
-    app.view.mainloop()
+    root = tk.Tk()
+    app = WelcomeController(root)
+    root.mainloop()

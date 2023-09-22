@@ -1,5 +1,7 @@
 import tkinter as tk
 from view.welcome_view import WelcomeView
+from controller.register_controller import RegisterController
+from controller.login_controller import LoginController
 from view.login_view import LoginView
 from view.register_view import RegisterView
 

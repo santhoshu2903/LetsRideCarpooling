@@ -3,6 +3,7 @@ import random
 from tkinter import messagebox
 from view.login_view import LoginView
 from view.welcome_view import WelcomeView
+from controller.welcome_controller import WelcomeController
 
 class LoginController:
     def __init__(self, root):
