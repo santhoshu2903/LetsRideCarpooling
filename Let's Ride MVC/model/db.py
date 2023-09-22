@@ -13,8 +13,7 @@ def init_db(db_name, role):
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            role TEXT DEFAULT ?
+            password TEXT NOT NULL
         );
         ''', (role,))
 
