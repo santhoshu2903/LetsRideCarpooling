@@ -6,7 +6,9 @@ import View
 class Controller:
     def __init__(self):
         self.model = Model.Model()
-        self.view =View.View()
+        # self.root=Tk()
+        # self.view =View.View(self.root,self)
+        # self.root.mainloop()
 
     def register_user(self):
         current_tab = self.view.get_current_tab()  # Get the current tab from the view
