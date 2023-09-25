@@ -25,21 +25,23 @@ class Model:
             );
             ''')
 
-    def insert_rider(self, username, password, phone_number, phone_extension):
+    def setRider(self, username, password, phone_number, phone_extension):
         with sqlite3.connect(self.riders_db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO users (username, password, phone_number, phone_extension)
                 VALUES (?, ?, ?, ?)
             ''', (username, password, phone_number, phone_extension))
+            return True
     
-    def insert_passenger(self, username, password, phone_number, phone_extension):
+    def setPassenger(self, username, password, phone_number, phone_extension):
         with sqlite3.connect(self.passengers_db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO users (username, password, phone_number, phone_extension)
                 VALUES (?, ?, ?, ?)
             ''', (username, password, phone_number, phone_extension))
+            return True
     
     def get_user_by_username(self, db_path, username):
         with sqlite3.connect(db_path) as conn:

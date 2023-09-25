@@ -1,15 +1,17 @@
 from tkinter import * 
+from tkinter import messagebox
 import tkinter.ttk as ttk
 import Controller
 import Model 
 
 class View:
     def __init__(self, root=None):
+        self.messagebox =messagebox
         self.root = root
         self.controller = Controller.Controller()
         self.model = Model.Model()
         self.root.title("Let's Go, Ride with US")
-        self.root.geometry("500x400")
+        self.root.geometry("600x500")
         self.show_welcome()
 
 
@@ -60,80 +62,109 @@ class View:
 
     def show_register(self):
         pass
-        # self.clear_content()
+        self.clear_content()
 
-        # self.notebook = ttk.Notebook(self.root)  # Use self.root as the parent
+        self.notebook = ttk.Notebook(self.root)  # Use self.root as the parent
 
-        # # Rider Tab
-        # self.rider_frame = ttk.Frame(self.notebook)
-        #     # Add this after creating the notebook widget
-        # self.root.grid_rowconfigure(0, weight=1)
-        # self.root.grid_columnconfigure(0, weight=1)
+        # Rider Tab
+        self.rider_frame = ttk.Frame(self.notebook)
+        # Add this after creating the notebook widget
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
 
 
-        # self.rider_username_label = ttk.Label(self.rider_frame, text="Rider Username:")
-        # self.rider_username_label.pack(pady=10)
+        self.rider_username_label = ttk.Label(self.rider_frame, text="Rider Username:")
+        self.rider_username_label.pack(pady=10)
 
-        # self.rider_username_entry = ttk.Entry(self.rider_frame)
-        # self.rider_username_entry.pack(pady=10)
+        self.rider_username_entry = ttk.Entry(self.rider_frame)
+        self.rider_username_entry.pack(pady=10)
 
-        # self.rider_password_label = ttk.Label(self.rider_frame, text="Rider Password:")
-        # self.rider_password_label.pack(pady=10)
+        self.rider_password_label = ttk.Label(self.rider_frame, text="Rider Password:")
+        self.rider_password_label.pack(pady=10)
 
-        # self.rider_password_entry = ttk.Entry(self.rider_frame, show="*")
-        # self.rider_password_entry.pack(pady=10)
+        self.rider_password_entry = ttk.Entry(self.rider_frame, show="*")
+        self.rider_password_entry.pack(pady=10)
 
-        # phone_extensions = ["+1", "+44", "+91", "+33"]  # Example extensions, you can add more
+        phone_extensions = ["+1", "+44", "+91", "+33"]  # Example extensions, you can add more
 
-        # self.rider_password_label = ttk.Label(self.rider_frame, text="Rider Phone Number:")
-        # self.rider_password_label.pack(pady=10)
+        self.rider_password_label = ttk.Label(self.rider_frame, text="Rider Phone Number:")
+        self.rider_password_label.pack(pady=10)
 
-        # self.rider_phone_extension_combobox = ttk.Combobox(self.rider_frame, values=phone_extensions)
-        # self.rider_phone_extension_combobox.pack(pady=10)
-        # self.rider_phone_extension_combobox.set(phone_extensions[0])  # Set default value
+        self.rider_phone_extension_combobox = ttk.Combobox(self.rider_frame, values=phone_extensions)
+        self.rider_phone_extension_combobox.pack(pady=10)
+        self.rider_phone_extension_combobox.set(phone_extensions[0])  # Set default value
 
-        # self.rider_phone_number_entry = ttk.Entry(self.rider_frame)
-        # self.rider_phone_number_entry.pack(pady=10)
+        self.rider_phone_number_entry = ttk.Entry(self.rider_frame)
+        self.rider_phone_number_entry.pack(pady=10)
+        
 
-        # self.rider_register_btn = ttk.Button(self.rider_frame, text="Register as Rider", command=self.model.insert_rider)  # You can customize the command for rider-specific registration
-        # self.rider_register_btn.pack(pady=10)
+        self.rider_register_btn = ttk.Button(self.rider_frame, text="Register as Rider", command=self.sendRegisterRiderData)  # You can customize the command for rider-specific registration
+        self.rider_register_btn.pack(pady=10)
 
-        # self.notebook.add(self.rider_frame, text="Rider")
+        self.notebook.add(self.rider_frame, text="Rider")
 
-        # # Passenger Tab
-        # self.passenger_frame = ttk.Frame(self.notebook)
+        # Passenger Tab
+        self.passenger_frame = ttk.Frame(self.notebook)
 
-        # self.passenger_username_label = ttk.Label(self.passenger_frame, text="Passenger Username:")
-        # self.passenger_username_label.pack(pady=10)
+        self.passenger_username_label = ttk.Label(self.passenger_frame, text="Passenger Username:")
+        self.passenger_username_label.pack(pady=10)
 
-        # self.passenger_username_entry = ttk.Entry(self.passenger_frame)
-        # self.passenger_username_entry.pack(pady=10)
+        self.passenger_username_entry = ttk.Entry(self.passenger_frame)
+        self.passenger_username_entry.pack(pady=10)
 
-        # self.passenger_password_label = ttk.Label(self.passenger_frame, text="Passenger Password:")
-        # self.passenger_password_label.pack(pady=10)
+        self.passenger_password_label = ttk.Label(self.passenger_frame, text="Passenger Password:")
+        self.passenger_password_label.pack(pady=10)
 
-        # self.passenger_password_entry = ttk.Entry(self.passenger_frame, show="*")
-        # self.passenger_password_entry.pack(pady=10)
+        self.passenger_password_entry = ttk.Entry(self.passenger_frame, show="*")
+        self.passenger_password_entry.pack(pady=10)
 
-        # self.passenger_password_label = ttk.Label(self.passenger_frame, text="Passenger Phone Number:")
-        # self.passenger_password_label.pack(pady=10)
+        self.passenger_password_label = ttk.Label(self.passenger_frame, text="Passenger Phone Number:")
+        self.passenger_password_label.pack(pady=10)
 
-        # self.passenger_phone_extension_combobox = ttk.Combobox(self.passenger_frame, values=phone_extensions)
-        # self.passenger_phone_extension_combobox.pack(pady=10)
-        # self.passenger_phone_extension_combobox.set(phone_extensions[0])  # Set default value
+        self.passenger_phone_extension_combobox = ttk.Combobox(self.passenger_frame, values=phone_extensions)
+        self.passenger_phone_extension_combobox.pack(pady=10)
+        self.passenger_phone_extension_combobox.set(phone_extensions[0])  # Set default value
 
-        # self.passenger_phone_number_entry = ttk.Entry(self.passenger_frame)
-        # self.passenger_phone_number_entry.pack(pady=10)
+        self.passenger_phone_number_entry = ttk.Entry(self.passenger_frame)
+        self.passenger_phone_number_entry.pack(pady=10)
 
-        # self.passenger_register_btn = ttk.Button(self.passenger_frame, text="Register as Passenger", command=self.model.register_user)  # You can customize the command for passenger-specific registration
-        # self.passenger_register_btn.pack(pady=10)
+        self.passenger_register_btn = ttk.Button(self.passenger_frame, text="Register as Passenger", command=self.sendRegisterPassengerData)  # You can customize the command for passenger-specific registration
+        self.passenger_register_btn.pack(pady=10)
 
-        # self.notebook.add(self.passenger_frame, text="Passenger")
+        self.notebook.add(self.passenger_frame, text="Passenger")
 
-        # self.notebook.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.notebook.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        # self.back_btn = ttk.Button(self.root, text="Back", command=self.show_welcome)  # Use self.root as the parent
+        self.back_btn = ttk.Button(self.root, text="Back", command=self.show_welcome)  # Use self.root as the parent
         # self.back_btn.pack(pady=10)
+
+
+    def sendRegisterRiderData(self):
+        
+        userName = self.rider_username_entry.get()
+        password =  self.rider_password_entry.get()
+        phoneNumber = self.rider_phone_number_entry.get()
+        phoneExtension = self.rider_phone_extension_combobox.get()
+
+        if userName or password or phoneNumber:
+            self.controller.registerRider(userName,password,phoneNumber,phoneExtension )
+            
+        return self.messagebox.showinfo("Required needs to filled.")
+        
+    def sendRegisterPassengerData(self):
+
+        userName = self.passenger_username_entry.get()
+        password =  self.passenger_password_entry.get()
+        phoneNumber = self.passenger_phone_number_entry.get()
+        phoneExtension = self.passenger_phone_extension_combobox.get()
+
+        if userName or password or phoneNumber:
+            self.controller.registerPassenger(userName,password,phoneNumber,phoneExtension )
+            
+        return self.messagebox.showinfo("Required needs to filled.")
+
+    # def showErrorMessage(self,message):
+
 
     def clear_content(self):
         # Remove all widgets from the window

@@ -6,9 +6,27 @@ import View
 class Controller:
     def __init__(self):
         self.model = Model.Model()
-        # self.root=Tk()
-        # self.view =View.View(self.root,self)
-        # self.root.mainloop()
+        # self.view= View.View()
+
+
+    def registerRider(self,username, password, phonenumber, extension):
+        # print(username, password, phonenumber, extension)
+        if not username or not password or not phonenumber:
+            self.view.show_error_message("Both fields are required!")
+            return
+    
+        return self.model.setRider(username,password, phonenumber, extension)
+        
+    
+
+
+    def registerPassenger(self,username, password, phonenumber, extension):
+        if not username or not password or not phonenumber:
+            self.view.show_error_message("Both fields are required!")
+            return
+    
+        return self.model.setPassenger(username,password, phonenumber, extension)
+
 
     def register_user(self):
         current_tab = self.view.get_current_tab()  # Get the current tab from the view
@@ -16,6 +34,7 @@ class Controller:
         if current_tab == "Rider":
             username = self.view.get_rider_username()
             password = self.view.get_rider_password()
+
             phone_extension = self.view.get_rider_phone_extension()
             phone_number = self.view.get_rider_phone_number()
             table_name = "riders"
@@ -29,7 +48,7 @@ class Controller:
             return
 
         if not username or not password:
-            self.view.show_error_message("Both fields are required!")
+            # self.view.show_error_message("Both fields are required!")
             return
 
         # Call the appropriate method in the Model to insert the user
@@ -38,7 +57,7 @@ class Controller:
         elif current_tab == "Passenger":
             self.model.insert_passenger(username, password, phone_number, phone_extension)
 
-        self.view.show_success_message(f"Registered Successfully as {current_tab}!")
+        # self.view.show_success_message(f"Registered Successfully as {current_tab}!")
 
 
     def send_otp(self):
