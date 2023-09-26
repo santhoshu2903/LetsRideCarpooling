@@ -13,6 +13,8 @@ class View:
         self.root.title("Let's Go, Ride with US")
         self.root.geometry("400x400")
         self.show_welcome()
+        style = ttk.Style()
+        style.configure("Black.TButton", foreground="black", background="black")
 
 
     def show_welcome(self):
@@ -21,10 +23,10 @@ class View:
         self.label = ttk.Label(self.root, text="Welcome to the App!")
         self.label.pack(pady=40)
 
-        self.login_button = ttk.Button(self.root, text="Login", command=self.show_login)
+        self.login_button = ttk.Button(self.root, text="Login", command=self.show_login, style="Black.TButton")
         self.login_button.pack(pady=10)
         
-        self.register_button = ttk.Button(self.root, text="Register", command=self.show_register)
+        self.register_button = ttk.Button(self.root, text="Register", command=self.show_register, style="Black.TButton")
         self.register_button.pack(pady=10)
 
 
@@ -49,13 +51,13 @@ class View:
         self.otp_entry = ttk.Entry(self.root)
         self.otp_entry.pack(pady=10)
         
-        self.send_otp_btn = ttk.Button(self.root, text="Send OTP", command=self.sendOtpRequest)
+        self.send_otp_btn = ttk.Button(self.root, text="Send OTP", command=self.sendOtpRequest, style="Black.TButton")
         self.send_otp_btn.pack(pady=10)
         
-        self.login_btn = ttk.Button(self.root, text="Login", command=self.controller.login_user)
+        self.login_btn = ttk.Button(self.root, text="Login", command=self.controller.login_user, style="Black.TButton")
         self.login_btn.pack(pady=10)
         
-        self.back_btn = ttk.Button(self.root, text="Back", command=self.show_welcome)
+        self.back_btn = ttk.Button(self.root, text="Back", command=self.show_welcome, style="Black.TButton")
         self.back_btn.pack(pady=10)
         
 
@@ -91,10 +93,10 @@ class View:
         self.rider_phone_number_entry = ttk.Entry(self.rider_frame)
         self.rider_phone_number_entry.grid(row=3, column=1, padx=10, pady=10, sticky="w")
 
-        self.rider_register_btn = ttk.Button(self.rider_frame, text="Register as Rider", command=self.sendRegisterRiderData)
+        self.rider_register_btn = ttk.Button(self.rider_frame, text="Register as Rider", command=self.sendRegisterRiderData, style="Black.TButton")
         self.rider_register_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
 
-        self.rider_back_btn = ttk.Button(self.rider_frame, text="Back", command=self.show_welcome)
+        self.rider_back_btn = ttk.Button(self.rider_frame, text="Back", command=self.show_welcome, style="Black.TButton")
         self.rider_back_btn.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
         self.notebook.add(self.rider_frame, text="Register as a Rider")
@@ -124,10 +126,10 @@ class View:
         self.passenger_phone_number_entry = ttk.Entry(self.passenger_frame)
         self.passenger_phone_number_entry.grid(row=3, column=1, padx=10, pady=10, sticky="w")
 
-        self.passenger_register_btn = ttk.Button(self.passenger_frame, text="Register as Passenger", command=self.sendRegisterPassengerData)
+        self.passenger_register_btn = ttk.Button(self.passenger_frame, text="Register as Passenger", command=self.sendRegisterPassengerData, style="Black.TButton")
         self.passenger_register_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
 
-        self.passenger_back_btn = ttk.Button(self.passenger_frame, text="Back", command=self.show_welcome)
+        self.passenger_back_btn = ttk.Button(self.passenger_frame, text="Back", command=self.show_welcome, style="Black.TButton")
         self.passenger_back_btn.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
         self.notebook.add(self.passenger_frame, text="Register as a Passenger")
