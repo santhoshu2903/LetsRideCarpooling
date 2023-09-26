@@ -11,7 +11,7 @@ class View:
         self.controller = Controller.Controller()
         # self.model = Model.Model()
         self.root.title("Let's Go, Ride with US")
-        self.root.geometry("600x500")
+        self.root.geometry("400x400")
         self.show_welcome()
 
 
@@ -61,88 +61,80 @@ class View:
 
 
     def show_register(self):
-        pass
         self.clear_content()
 
         self.notebook = ttk.Notebook(self.root)  # Use self.root as the parent
 
         # Rider Tab
         self.rider_frame = ttk.Frame(self.notebook)
-        # Add this after creating the notebook widget
-        self.root.grid_rowconfigure(0, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
-
 
         self.rider_username_label = ttk.Label(self.rider_frame, text="Rider Username:")
-        self.rider_username_label.pack(pady=10)
+        self.rider_username_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
         self.rider_username_entry = ttk.Entry(self.rider_frame)
-        self.rider_username_entry.pack(pady=10)
+        self.rider_username_entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 
         self.rider_password_label = ttk.Label(self.rider_frame, text="Rider Password:")
-        self.rider_password_label.pack(pady=10)
+        self.rider_password_label.grid(row=1, column=0, padx=10, pady=10, sticky="w")
 
         self.rider_password_entry = ttk.Entry(self.rider_frame, show="*")
-        self.rider_password_entry.pack(pady=10)
+        self.rider_password_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
 
         phone_extensions = ["+1", "+44", "+91", "+33"]  # Example extensions, you can add more
 
-        self.rider_password_label = ttk.Label(self.rider_frame, text="Rider Phone Number:")
-        self.rider_password_label.pack(pady=10)
+        self.rider_phone_label = ttk.Label(self.rider_frame, text="Rider Phone Number:")
+        self.rider_phone_label.grid(row=2, column=0, padx=10, pady=10, sticky="w")
 
         self.rider_phone_extension_combobox = ttk.Combobox(self.rider_frame, values=phone_extensions)
-        self.rider_phone_extension_combobox.pack(pady=10)
+        self.rider_phone_extension_combobox.grid(row=2, column=1, padx=10, pady=10, sticky="w")
         self.rider_phone_extension_combobox.set(phone_extensions[0])  # Set default value
 
         self.rider_phone_number_entry = ttk.Entry(self.rider_frame)
-        self.rider_phone_number_entry.pack(pady=10)
-        
+        self.rider_phone_number_entry.grid(row=3, column=1, padx=10, pady=10, sticky="w")
 
-        self.rider_register_btn = ttk.Button(self.rider_frame, text="Register as Rider", command=self.sendRegisterRiderData)  # You can customize the command for rider-specific registration
-        self.rider_register_btn.pack(pady=10)
+        self.rider_register_btn = ttk.Button(self.rider_frame, text="Register as Rider", command=self.sendRegisterRiderData)
+        self.rider_register_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
 
-        self.back_btn_passenger = ttk.Button(self.rider_frame, text="Back", command=self.show_welcome)
-        self.back_btn_passenger.pack(pady=10)
+        self.rider_back_btn = ttk.Button(self.rider_frame, text="Back", command=self.show_welcome)
+        self.rider_back_btn.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
-        self.notebook.add(self.rider_frame, text="Rider")
+        self.notebook.add(self.rider_frame, text="Register as a Rider")
 
         # Passenger Tab
         self.passenger_frame = ttk.Frame(self.notebook)
 
         self.passenger_username_label = ttk.Label(self.passenger_frame, text="Passenger Username:")
-        self.passenger_username_label.pack(pady=10)
+        self.passenger_username_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
         self.passenger_username_entry = ttk.Entry(self.passenger_frame)
-        self.passenger_username_entry.pack(pady=10)
+        self.passenger_username_entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 
         self.passenger_password_label = ttk.Label(self.passenger_frame, text="Passenger Password:")
-        self.passenger_password_label.pack(pady=10)
+        self.passenger_password_label.grid(row=1, column=0, padx=10, pady=10, sticky="w")
 
         self.passenger_password_entry = ttk.Entry(self.passenger_frame, show="*")
-        self.passenger_password_entry.pack(pady=10)
+        self.passenger_password_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
 
-        self.passenger_password_label = ttk.Label(self.passenger_frame, text="Passenger Phone Number:")
-        self.passenger_password_label.pack(pady=10)
+        self.passenger_phone_label = ttk.Label(self.passenger_frame, text="Passenger Phone Number:")
+        self.passenger_phone_label.grid(row=2, column=0, padx=10, pady=10, sticky="w")
 
         self.passenger_phone_extension_combobox = ttk.Combobox(self.passenger_frame, values=phone_extensions)
-        self.passenger_phone_extension_combobox.pack(pady=10)
+        self.passenger_phone_extension_combobox.grid(row=2, column=1, padx=10, pady=10, sticky="w")
         self.passenger_phone_extension_combobox.set(phone_extensions[0])  # Set default value
 
         self.passenger_phone_number_entry = ttk.Entry(self.passenger_frame)
-        self.passenger_phone_number_entry.pack(pady=10)
+        self.passenger_phone_number_entry.grid(row=3, column=1, padx=10, pady=10, sticky="w")
 
-        self.passenger_register_btn = ttk.Button(self.passenger_frame, text="Register as Passenger", command=self.sendRegisterPassengerData)  # You can customize the command for passenger-specific registration
-        self.passenger_register_btn.pack(pady=10)
+        self.passenger_register_btn = ttk.Button(self.passenger_frame, text="Register as Passenger", command=self.sendRegisterPassengerData)
+        self.passenger_register_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
 
-        self.back_btn_passenger = ttk.Button(self.passenger_frame, text="Back", command=self.show_welcome)
-        self.back_btn_passenger.pack(pady=10)
+        self.passenger_back_btn = ttk.Button(self.passenger_frame, text="Back", command=self.show_welcome)
+        self.passenger_back_btn.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
-        self.notebook.add(self.passenger_frame, text="Passenger")
+        self.notebook.add(self.passenger_frame, text="Register as a Passenger")
 
         self.notebook.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        # self.back_btn = ttk.Button(self.root, text="Back", command=self.show_welcome)  # Use self.root as the parent
-        # self.back_btn.pack(pady=10)
 
 
     def sendRegisterRiderData(self):

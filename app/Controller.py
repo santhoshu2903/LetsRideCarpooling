@@ -29,8 +29,7 @@ class Controller:
 
 
     def register_user(self):
-        current_tab = self.view.get_current_tab()  # Get the current tab from the view
-
+        current_tab = self.view.get_current_tab()  
         if current_tab == "Rider":
             username = self.view.get_rider_username()
             password = self.view.get_rider_password()
