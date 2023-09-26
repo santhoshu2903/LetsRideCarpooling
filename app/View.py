@@ -157,16 +157,23 @@ class View:
 
 
     def sendRegisterRiderData(self):
-        
         userName = self.rider_username_entry.get()
-        password =  self.rider_password_entry.get()
+        password = self.rider_password_entry.get()
         phoneNumber = self.rider_phone_number_entry.get()
-        phoneExtension = self.rider_phone_extension_combobox.get()
 
-        if userName or password or phoneNumber:
-            return self.controller.registerRider(userName,password,phoneNumber,phoneExtension )
-            
-        self.messagebox.showerror("Error","Required info needs to filled.")
+        if not userName or not password or not phoneNumber:
+            self.messagebox.showerror("Error","All fields are required.")
+        else:
+            # Combine phone extension and phone number
+            phoneExtension = self.rider_phone_extension_combobox.get()
+            completePhoneNumber = phoneExtension + phoneNumber
+
+            # Register the rider
+            if self.controller.registerRider(userName, password, completePhoneNumber):
+                self.messagebox.showinfo("Success","Rider registered successfully.")
+            else:
+                self.messagebox.showerror("Error","Error registering rider.")
+
         
     def sendRegisterPassengerData(self):
 
@@ -175,10 +182,13 @@ class View:
         phoneNumber = self.passenger_phone_number_entry.get()
         phoneExtension = self.passenger_phone_extension_combobox.get()
 
+        completePhoneNumber = phoneExtension+phoneNumber
+
         if userName or password or phoneNumber:
-            return self.controller.registerPassenger(userName,password,phoneNumber,phoneExtension )
+            return self.controller.registerPassenger(userName,password,completePhoneNumber )
             
         self.messagebox.showerror("Error","Required needs to filled.")
+
 
 
 

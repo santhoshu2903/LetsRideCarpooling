@@ -13,24 +13,23 @@ class Controller:
         # self.view= View.View()
 
 
-    def registerRider(self,username, password, phonenumber, extension):
+    def registerRider(self,username, password, phoneNumber):
         # print(username, password, phonenumber, extension)
-        if not username or not password or not phonenumber:
-            self.view.show_error_message("Both fields are required!")
-            return
+        if not username or not password or not phoneNumber:
+            return False
     
-        return self.model.setRider(username,password, phonenumber, extension)
+        self.model.setRider(username,password, phoneNumber)
         
+        return True
     
 
 
-    def registerPassenger(self,username, password, phonenumber, extension):
-        if not username or not password or not phonenumber:
-            self.view.show_error_message("Both fields are required!")
-            return
+    def registerPassenger(self,username, password, phoneNumber):
+        if not username or not password or not phoneNumber:
+            return False
     
-        return self.model.setPassenger(username,password, phonenumber, extension)
-
+        return self.model.setPassenger(username,password, phoneNumber)
+        return True
 
     def register_user(self):
         current_tab = self.view.get_current_tab()  
