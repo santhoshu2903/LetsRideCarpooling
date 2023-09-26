@@ -4,6 +4,7 @@ import os
 DATABASE_DIR = os.path.join(os.getcwd(), "Database")
 RIDERS_DB = os.path.join(DATABASE_DIR, "riders.db")
 PASSENGERS_DB = os.path.join(DATABASE_DIR, "passengers.db")
+ALL_USERS_DB =os.path.join(DATABASE_DIR,"all_users.db")
 
 class Model:
     def __init__(self, riders_db_path=RIDERS_DB, passengers_db_path=PASSENGERS_DB):

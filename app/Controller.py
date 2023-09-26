@@ -1,11 +1,15 @@
 from tkinter import *
 import Model
 import View
+from twilio.rest import Client 
+import random
 
 
 class Controller:
     def __init__(self):
         self.model = Model.Model()
+        self.twilioClient = Client
+        self.randInt = random.randint
         # self.view= View.View()
 
 
@@ -59,8 +63,37 @@ class Controller:
         # self.view.show_success_message(f"Registered Successfully as {current_tab}!")
 
 
-    def send_otp(self):
-        pass
+    def sendOtp(self,phoneNumber):
+        
+        #twillio Details
+
+        accountSID = "ACd607e2f86a57f692c81867be2f0b351f"
+        authToken = "96b7f2afb95fe95ebdda6d837187d123"
+        twillioPhoneNumber = "+18449584452"
+
+        smsClient =  self.twilioClient( accountSID,authToken)
+
+
+        otpMessage = f"Your Let's Go, OTP is  {self.generateOTP()}"
+
+        try:
+            otpMessage = smsClient.messages.create(
+                to = phoneNumber,
+                from_= twillioPhoneNumber,
+                body = otpMessage
+            )
+        except Exception as e:
+            print(e)
+            return False
+
+        
+
+
+
+
+    def generateOTP(self):
+        return self.randInt(100000,999999)
+    
 
     def login_user(self):
         pass

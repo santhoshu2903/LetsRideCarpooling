@@ -49,7 +49,7 @@ class View:
         self.otp_entry = ttk.Entry(self.root)
         self.otp_entry.pack(pady=10)
         
-        self.send_otp_btn = ttk.Button(self.root, text="Send OTP", command=self.controller.send_otp)
+        self.send_otp_btn = ttk.Button(self.root, text="Send OTP", command=self.sendOtpRequest)
         self.send_otp_btn.pack(pady=10)
         
         self.login_btn = ttk.Button(self.root, text="Login", command=self.controller.login_user)
@@ -63,7 +63,7 @@ class View:
     def show_register(self):
         self.clear_content()
 
-        self.notebook = ttk.Notebook(self.root)  # Use self.root as the parent
+        self.notebook = ttk.Notebook(self.root) 
 
         # Rider Tab
         self.rider_frame = ttk.Frame(self.notebook)
@@ -80,8 +80,7 @@ class View:
         self.rider_password_entry = ttk.Entry(self.rider_frame, show="*")
         self.rider_password_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
 
-        phone_extensions = ["+1", "+44", "+91", "+33"]  # Example extensions, you can add more
-
+        phone_extensions = ["+1", "+44", "+91", "+33"]  
         self.rider_phone_label = ttk.Label(self.rider_frame, text="Rider Phone Number:")
         self.rider_phone_label.grid(row=2, column=0, padx=10, pady=10, sticky="w")
 
@@ -137,6 +136,26 @@ class View:
 
 
 
+    def sendOtpRequest(self):
+
+        phoneExtension = self.phone_extension_combobox.get()
+        phoneNumber = self.phone_number_entry.get()
+
+        if not phoneNumber:
+            messagebox.showerror("Error", "Phone number is required!")
+            return
+        
+        completePhoneNumber= phoneExtension+phoneNumber
+
+        if self.controller.sendOtp(completePhoneNumber):
+            return self.messagebox.showinfo("Success","OTP Sent Succesfully")
+        return self.messagebox.showinfo("Error","Error Sending OTP")
+
+
+
+
+
+
     def sendRegisterRiderData(self):
         
         userName = self.rider_username_entry.get()
@@ -145,9 +164,9 @@ class View:
         phoneExtension = self.rider_phone_extension_combobox.get()
 
         if userName or password or phoneNumber:
-            self.controller.registerRider(userName,password,phoneNumber,phoneExtension )
+            return self.controller.registerRider(userName,password,phoneNumber,phoneExtension )
             
-        return self.messagebox.showinfo("Required needs to filled.")
+        self.messagebox.showerror("Error","Required info needs to filled.")
         
     def sendRegisterPassengerData(self):
 
@@ -157,11 +176,10 @@ class View:
         phoneExtension = self.passenger_phone_extension_combobox.get()
 
         if userName or password or phoneNumber:
-            self.controller.registerPassenger(userName,password,phoneNumber,phoneExtension )
+            return self.controller.registerPassenger(userName,password,phoneNumber,phoneExtension )
             
-        return self.messagebox.showinfo("Required needs to filled.")
+        self.messagebox.showerror("Error","Required needs to filled.")
 
-    # def showErrorMessage(self,message):
 
 
     def clear_content(self):
