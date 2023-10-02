@@ -3,6 +3,7 @@ import Model
 import View
 from twilio.rest import Client 
 import random
+from tkinter import messagebox
 
 
 class Controller:
@@ -67,7 +68,7 @@ class Controller:
         #twillio Details
 
         accountSID = "ACd607e2f86a57f692c81867be2f0b351f"
-        authToken = "96b7f2afb95fe95ebdda6d837187d123"
+        authToken = "b8c87d72917d74156dedf963d6e4b373"
         twillioPhoneNumber = "+18449584452"
 
         smsClient =  self.twilioClient( accountSID,authToken)
@@ -97,4 +98,17 @@ class Controller:
     def login_user(self):
         pass
 
+
+    def create_ride(self):
+        from_location = self.view.from_entry_create.get()
+        to_location = self.view.to_entry_create.get()
+        date = self.view.date_entry_create.get()
+        time = self.view.time_entry_create.get()
+
+        if from_location and to_location and date and time:
+            ride_id = self.model.add_ride(from_location, to_location, date, time)
+            messagebox.showinfo("Success", f"Ride created with ID: {ride_id}")
+            # You can clear the input fields or perform any other necessary actions here
+        else:
+            messagebox.showerror("Error", "Please fill in all fields.")
     # Add similar methods for retrieving users, handling user interactions, etc.

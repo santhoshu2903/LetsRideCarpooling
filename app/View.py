@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import tkinter.ttk as ttk
 import Controller
+from tkinter import PhotoImage
 # import Model 
 
 class View:
@@ -15,10 +16,14 @@ class View:
         self.show_welcome()
         style = ttk.Style()
         style.configure("Black.TButton", foreground="black", background="black")
+        self.background_image = PhotoImage(file='')
+
+    
 
 
     def show_welcome(self):
         self.clear_content()
+        
 
         self.label = ttk.Label(self.root, text="Welcome to the App!")
         self.label.pack(pady=40)
@@ -191,7 +196,30 @@ class View:
             
         self.messagebox.showerror("Error","Required needs to filled.")
 
+    def show_create_ride(self):
+        # Clear the login screen widgets
+        self.view.clear_content()
 
+        # Add labels and text boxes for "To," "From," "Date," and "Time"
+        ttk.Label(self.root, text="To:").pack(pady=5)
+        self.to_entry_create = ttk.Entry(self.root)
+        self.to_entry_create.pack(pady=5)
+
+        ttk.Label(self.root, text="From:").pack(pady=5)
+        self.from_entry_create = ttk.Entry(self.root)
+        self.from_entry_create.pack(pady=5)
+
+        ttk.Label(self.root, text="Date:").pack(pady=5)
+        self.date_entry_create = ttk.Entry(self.root)
+        self.date_entry_create.pack(pady=5)
+
+        ttk.Label(self.root, text="Time:").pack(pady=5)
+        self.time_entry_create = ttk.Entry(self.root)
+        self.time_entry_create.pack(pady=5)
+
+        # Create Ride button
+        self.create_ride_button = ttk.Button(self.root, text="Create Ride", command=self.create_ride, style="Black.TButton")
+        self.create_ride_button.pack(pady=10)
 
 
     def clear_content(self):

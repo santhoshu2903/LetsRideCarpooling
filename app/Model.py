@@ -4,16 +4,19 @@ import os
 DATABASE_DIR = os.path.join(os.getcwd(), "Database")
 RIDERS_DB = os.path.join(DATABASE_DIR, "riders.db")
 PASSENGERS_DB = os.path.join(DATABASE_DIR, "passengers.db")
+RIDES_DB = os.path.join(DATABASE_DIR, "rides.db")
 ALL_USERS_DB =os.path.join(DATABASE_DIR,"all_users.db")
 
 class Model:
-    def __init__(self,all_users_db_path =ALL_USERS_DB, riders_db_path=RIDERS_DB, passengers_db_path=PASSENGERS_DB):
+    def __init__(self,all_users_db_path =ALL_USERS_DB, riders_db_path=RIDERS_DB, passengers_db_path=PASSENGERS_DB, rides_db_path=RIDES_DB):
         self.riders_db_path = riders_db_path
         self.passengers_db_path = passengers_db_path
+        self.rides_db_path = rides_db_path
         self.all_users_db_path = all_users_db_path
 
         self.init_db(self.riders_db_path)
         self.init_db(self.passengers_db_path)
+        self.init_db(rides_db_path)
         self.init_all_users_db()
 
 
@@ -81,6 +84,30 @@ class Model:
             conn.commit()  # Commit the changes
 
         return True
+    
+
+    def create_table(self):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS rides (
+                    id INTEGER PRIMARY KEY,
+                    from_location TEXT,
+                    to_location TEXT,
+                    date TEXT,
+                    time TEXT
+                )
+            ''')
+
+    def add_ride(self, from_location, to_location, date, time):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO rides (from_location, to_location, date, time)
+                VALUES (?, ?, ?, ?)
+            ''', (from_location, to_location, date, time))
+            ride_id = cursor.lastrowid
+        return ride_id
     
     def get_user_by_username(self, db_path, username):
         with sqlite3.connect(db_path) as conn:
