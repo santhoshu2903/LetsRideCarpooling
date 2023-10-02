@@ -3,6 +3,7 @@ import Model
 import View
 from twilio.rest import Client 
 import random
+# from vonage import Client
 
 
 class Controller:
@@ -67,16 +68,16 @@ class Controller:
         #twillio Details
         print("controller otp",phoneNumber)
 
-        #account 1
-        # accountSID = "ACd607e2f86a57f692c81867be2f0b351f"
-        # authToken = "b8c87d72917d74156dedf963d6e4b373"
-        # twillioPhoneNumber = "+18449584452"
+        # account 1
+        accountSID = "ACd607e2f86a57f692c81867be2f0b351f"
+        authToken = "28000cefd2c2ff8f4c7ebb8b73d500ea"
+        twillioPhoneNumber = "+18449584452"
 
 
         #account2
-        accountSID = "AC0ced1832758903e7cc0d69bff6b1d26f"
-        authToken = "be2b35e7801d348501b8cb80ae5532d3"
-        twillioPhoneNumber = "+18447342183"
+        # accountSID = "AC0ced1832758903e7cc0d69bff6b1d26f"
+        # authToken = "be2b35e7801d348501b8cb80ae5532d3"
+        # twillioPhoneNumber = "+18447342183"
 
 
         smsClient =  self.twilioClient( accountSID,authToken)
