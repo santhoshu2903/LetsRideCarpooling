@@ -2,89 +2,72 @@ import sqlite3
 import os
 
 DATABASE_DIR = os.path.join(os.getcwd(), "Database")
-RIDERS_DB = os.path.join(DATABASE_DIR, "riders.db")
-PASSENGERS_DB = os.path.join(DATABASE_DIR, "passengers.db")
-RIDES_DB = os.path.join(DATABASE_DIR, "rides.db")
-ALL_USERS_DB =os.path.join(DATABASE_DIR,"all_users.db")
+USERS_DB =os.path.join(DATABASE_DIR,"users.db")
 
 class Model:
-    def __init__(self,all_users_db_path =ALL_USERS_DB, riders_db_path=RIDERS_DB, passengers_db_path=PASSENGERS_DB, rides_db_path=RIDES_DB):
-        self.riders_db_path = riders_db_path
-        self.passengers_db_path = passengers_db_path
-        self.rides_db_path = rides_db_path
-        self.all_users_db_path = all_users_db_path
+    def __init__(self,users_db_path =USERS_DB):
 
-        self.init_db(self.riders_db_path)
-        self.init_db(self.passengers_db_path)
-        self.init_db(rides_db_path)
-        self.init_all_users_db()
+        self.users_db_path = users_db_path
+
+        self.init_users_db()
 
 
 
-    def init_db(self, db_path):
-        with sqlite3.connect(db_path) as conn:
+    def init_users_db(self):
+        with sqlite3.connect(self.users_db_path) as conn:
             cursor = conn.cursor()
+        
+            # Drop the existing users table if it exists
+            cursor.execute('DROP TABLE IF EXISTS users')
+        
+            # Create a new table with the desired structure
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS users (
                 userid INTEGER PRIMARY KEY AUTOINCREMENT,
+                first_name TEXT NOT NULL,
+                last_name TEXT NOT NULL,
                 username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
-                phone_number TEXT
-            );
-            ''')
-
-
-    def init_all_users_db(self):
-        with sqlite3.connect(self.all_users_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS users (
-                userid INTEGER PRIMARY KEY AUTOINCREMENT,
                 phone_number TEXT NOT NULL UNIQUE,
-                role TEXT NOT NULL
+                dob TEXT NOT NULL
             );
             ''')
 
-    def setRider(self, username, password, phone_number):
-        with sqlite3.connect(self.all_users_db_path) as conn:
+
+    def get_user_by_username(self, username):
+        with sqlite3.connect(self.users_db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO users (phone_number, role)
-                VALUES (?, ?)
-            ''', (phone_number, "rider"))
-            conn.commit()  # Commit the changes
-            generated_userid = cursor.lastrowid
+                SELECT * FROM users
+                WHERE username = ?
+            ''', (username,))
+            user_data = cursor.fetchone()
+            return user_data
+        
+    def login(self, username, password):
+        user_data = self.get_user_by_username(username)
+        if user_data:
+            if user_data[4] == password:
+                return True
+        return False
 
-        # Now, insert rider-specific data into the 'riders' table
-        with sqlite3.connect(self.riders_db_path) as conn:
+    def insertUser(self, first_name, last_name, username, password, phone_number, dob):
+        with sqlite3.connect(self.users_db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute('''
-                INSERT INTO users (userid, username, password, phone_number)
-                VALUES (?, ?, ?, ?)
-            ''', (generated_userid, username, password, phone_number))
-            conn.commit()
 
-    
-    def setPassenger(self, username, password, phone_number):
-        with sqlite3.connect(self.all_users_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                INSERT INTO users (phone_number,role)
-                VALUES (?,?)
-            ''', (phone_number,"passenger"))
-            conn.commit()  # Commit the changes
-            generated_userid = cursor.lastrowid
+            try:
+                cursor.execute('''
+                    INSERT INTO users (first_name, last_name, username, password, phone_number, dob)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ''', (first_name, last_name, username, password, phone_number, dob))
+                
+                conn.commit()
+                return True  # Insertion successful
+            except sqlite3.IntegrityError:
+                # Handle duplicate username or phone_number error
+                return False  # Insertion failed due to a duplicate
 
-        with sqlite3.connect(self.passengers_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                INSERT INTO users (userid, username, password, phone_number)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (generated_userid, username, password,phone_number))
-            conn.commit()  # Commit the changes
 
-        return True
-    
 
     def create_table(self):
         with sqlite3.connect(self.db_name) as conn:
@@ -96,7 +79,7 @@ class Model:
                     to_location TEXT,
                     date TEXT,
                     time TEXT
-                )
+                );
             ''')
 
     def add_ride(self, from_location, to_location, date, time):

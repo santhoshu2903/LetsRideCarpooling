@@ -1,9 +1,8 @@
 import tkinter
 from tkinter import messagebox
 import ttkbootstrap as tb
-import Controller
+# import Controller
 import tkinter.ttk as ttk
-from tkinter import font
 from tkcalendar import DateEntry
 
 class View:
@@ -11,10 +10,9 @@ class View:
         self.tb=tb
         self.tkinter = tkinter
         self.messagebox = messagebox
-        self.font = font
         #iconphoto not working
-        self.root = root
-        self.controller = Controller.Controller()
+        self.root = tb.Window(title="Let's Go Ride with US", themename="superhero",size=(600,400),iconphoto='images/icon.jpg' )
+        # self.controller = Controller.Controller()
         self.show_welcome()
 
     
@@ -22,13 +20,13 @@ class View:
     def show_welcome(self):
 
         self.clear_content()
-        self.root.geometry("600x400")
+
         self.label = tb.Label(self.root,text="Welcome to the App!", bootstyle="primary")
         self.label.pack(pady=40)
 
-        self.login_btn = tb.Button(self.root,text="Login",bootstyle="success")
+        self.login_btn = tb.Button(self.root,text="Login", bootstyle="success")
         self.login_btn.config(command=self.show_login)
-        self.login_btn.pack(pady=20)
+        self.login_btn.pack(pady=10)
 
         self.register_btn = tb.Button(self.root,text="Register", bootstyle="info")
         self.register_btn.config(command=self.show_register)
@@ -37,7 +35,6 @@ class View:
     def show_login(self):
 
         self.clear_content()
-        self.root.geometry("600x800")
         phone_extensions = ["+1", "+44", "+91", "+33"]
 
         self.phone_extension_combobox = tb.Combobox(self.root, values=phone_extensions)
@@ -64,6 +61,7 @@ class View:
 
         self.back_btn = tb.Button(self.root, text="Back", command=self.show_welcome, bootstyle="danger")  # Apply "danger" style
         self.back_btn.pack(pady=10)
+
 
     def show_register(self):
         self.clear_content()
@@ -105,7 +103,7 @@ class View:
         self.dob_label = ttk.Label(self.root, text="Date of Birth:")
         self.dob_label.pack(pady=10)
 
-        self.dob_entry = DateEntry(self.root, date_pattern="dd/mm/yyyy", style="default.TEntry")
+        self.dob_entry = tb(self.root, date_pattern="dd/mm/yyyy", style="default.TEntry")
         self.dob_entry.pack(pady=10)
 
         self.register_btn = ttk.Button(self.root, text="Register", command=self.sendRegisterUserData, style="success.TButton")  # Apply "success" style
@@ -212,3 +210,8 @@ class View:
         # Remove all widgets from the window
         for widget in self.root.winfo_children():
             widget.destroy()
+
+
+if __name__ == "__main__":
+    view = View()
+    view.root.mainloop()
