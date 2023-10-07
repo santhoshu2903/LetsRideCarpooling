@@ -37,7 +37,7 @@ class View:
     def show_login(self):
 
         self.clear_content()
-        self.root.geometry("600x800")
+        self.root.geometry("600x400")
         phone_extensions = ["+1", "+44", "+91", "+33"]
 
         self.phone_extension_combobox = tb.Combobox(self.root, values=phone_extensions)
@@ -66,7 +66,9 @@ class View:
         self.back_btn.pack(pady=10)
 
     def show_register(self):
+        
         self.clear_content()
+        self.root.geometry("600x650")
         use_gmail_var = self.tkinter.BooleanVar()
 
         self.first_name_label = ttk.Label(self.root, text="First Name:")
@@ -102,11 +104,11 @@ class View:
         self.phone_entry = ttk.Entry(self.root, style="default.TEntry")
         self.phone_entry.pack(pady=10)
 
-        self.dob_label = ttk.Label(self.root, text="Date of Birth:")
-        self.dob_label.pack(pady=10)
+        #self.dob_label = ttk.Label(self.root, text="Date of Birth:")
+        #self.dob_label.pack(pady=10)
 
-        self.dob_entry = DateEntry(self.root, date_pattern="dd/mm/yyyy", style="default.TEntry")
-        self.dob_entry.pack(pady=10)
+        #self.dob_entry = DateEntry(self.root, date_pattern="dd/mm/yyyy", style="default.TEntry")
+        #self.dob_entry.pack(pady=10)
 
         self.register_btn = ttk.Button(self.root, text="Register", command=self.sendRegisterUserData, style="success.TButton")  # Apply "success" style
         self.register_btn.pack(pady=10)
