@@ -89,20 +89,27 @@ class View:
         self.gmail_entry = ttk.Entry(self.root, style="default.TEntry")
         self.gmail_entry.pack(pady=10)
 
-        self.use_gmail_checkbox = ttk.Checkbutton(self.root, text="Use Gmail as Username", variable=use_gmail_var, command=self.update_username_entry, style="default.TCheckbutton")
-        self.use_gmail_checkbox.pack(pady=10)
+        #self.use_gmail_checkbox = ttk.Checkbutton(self.root, text="Use Gmail as Username", variable=use_gmail_var, command=self.update_username_entry, style="default.TCheckbutton")
+        #self.use_gmail_checkbox.pack(pady=10)
 
-        self.username_label = ttk.Label(self.root, text="Username:")
-        self.username_label.pack(pady=10)
+        #self.username_label = ttk.Label(self.root, text="Username:")
+        #self.username_label.pack(pady=10)
 
-        self.username_entry = ttk.Entry(self.root, style="default.TEntry")
-        self.username_entry.pack(pady=10)
+        #self.username_entry = ttk.Entry(self.root, style="default.TEntry")
+        #self.username_entry.pack(pady=10)
 
         self.phone_label = ttk.Label(self.root, text="Phone Number:")
         self.phone_label.pack(pady=10)
 
         self.phone_entry = ttk.Entry(self.root, style="default.TEntry")
         self.phone_entry.pack(pady=10)
+
+        self.user_type_label = ttk.Label(self.root, text="User Type:")
+        self.user_type_label.pack(pady=10)
+
+        user_type_values = ["Rider", "Passenger"]
+        self.user_type_combobox = ttk.Combobox(self.root, values=user_type_values, style="default.TCombobox")
+        self.user_type_combobox.pack(pady=10)
 
         #self.dob_label = ttk.Label(self.root, text="Date of Birth:")
         #self.dob_label.pack(pady=10)
