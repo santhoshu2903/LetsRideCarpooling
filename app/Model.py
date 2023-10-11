@@ -3,14 +3,12 @@ import os
 
 DATABASE_DIR = os.path.join(os.getcwd(), "Database")
 USERS_DB =os.path.join(DATABASE_DIR,"users.db")
+RIDES_DB =os.path.join(DATABASE_DIR,"rides.db")
 
 class Model:
     def __init__(self,users_db_path =USERS_DB):
-
         self.users_db_path = users_db_path
-
         self.init_users_db()
-
 
 
     def init_users_db(self):
@@ -33,6 +31,33 @@ class Model:
             );
             ''')
 
+    def init_rides_db(self):
+        with sqlite3.connect(self.rides_db_path) as conn:
+            cursor = conn.cursor()
+        
+            # Drop the existing rides table if it exists
+            cursor.execute('DROP TABLE IF EXISTS rides')
+        
+            # Create a new table with the desired structure
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS rides (
+                rideid INTEGER PRIMARY KEY AUTOINCREMENT,
+                from_location TEXT NOT NULL,
+                to_location TEXT NOT NULL,
+                date TEXT NOT NULL,
+                time TEXT NOT NULL
+            );
+            ''')
+
+
+    def get_all_rides(self):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT * FROM rides
+            ''')
+            rides = cursor.fetchall()
+        return rides
 
     def get_user_by_username(self, username):
         with sqlite3.connect(self.users_db_path) as conn:
@@ -67,21 +92,17 @@ class Model:
                 # Handle duplicate username or phone_number error
                 return False  # Insertion failed due to a duplicate
 
-
-
-    def create_table(self):
-        with sqlite3.connect(self.db_name) as conn:
+    def get_loginUser_by_phone_number(self, phone_number):
+        with sqlite3.connect(self.users_db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS rides (
-                    id INTEGER PRIMARY KEY,
-                    from_location TEXT,
-                    to_location TEXT,
-                    date TEXT,
-                    time TEXT
-                );
-            ''')
-
+                SELECT * FROM users
+                WHERE phone_number = ?
+            ''', (phone_number,))
+            user_data = cursor.fetchone()
+            return user_data
+        
+        
     def add_ride(self, from_location, to_location, date, time):
         with sqlite3.connect(self.db_name) as conn:
             cursor = conn.cursor()

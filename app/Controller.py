@@ -53,19 +53,18 @@ class Controller:
             print(e)
             return False
 
-    def checkLogin(self, phoneNumber):
-        return self.model.get_loginUser_by_phone_number(phoneNumber)
-
-        
-
-
-
+    def verify_login(self,phoneNumber):
+        if self.model.get_loginUser_by_phone_number(phoneNumber):
+            return True
+            self.sendOtp(phoneNumber)
+        return False
 
     def generateOTP(self):
         return self.randInt(100000,999999)
     
 
-    def login_user(self):
-        pass
+    def get_all_rides(self):
+        return self.model.get_all_rides()
+
 
     # Add similar methods for retrieving users, handling user interactions, etc.
