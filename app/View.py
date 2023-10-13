@@ -20,10 +20,13 @@ class View(ctk.CTk):
         self.clear_content()
         self.geometry("600x400")
 
+        self.show_welcome_frame = ctk.CTkFrame(self)
+
         self.ctk_label = ctk.CTkLabel(self,text="Welcome to the App!", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.ctk_label.pack(pady=40)
 
-        self.login_button = ctk.CTkButton(self, text="Login", command=self.show_login)
+        # self.login_button = ctk.CTkButton(self, text="Login", command=self.show_login)
+        self.login_button = ctk.CTkButton(self, text="Login", command=self.home_page)
         self.login_button.pack(pady=20)
 
         self.register_button = ctk.CTkButton(self, text="Register", command=self.show_register)
@@ -59,13 +62,170 @@ class View(ctk.CTk):
         self.back_button.pack(pady=10)
 
 
+    def home_page(self):
+        self.clear_content()
+        self.geometry("800x600")
+
+
+        #set grid layout
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+
+
+        #set navigation frame
+
+        self.navigation_frame = ctk.CTkFrame(self, bg_color="blue", corner_radius=0)
+        self.navigation_frame.grid(row=0, column=0, sticky="nsew")
+        self.navigation_frame.grid_rowconfigure(5, weight=1)
+
+
+        #set navigation buttons
+
+        #set dashboard button
+        self.dashboard_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="DashBoard",
+                                         fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
+                                         anchor="w",command=self.show_dashboard)
+        self.dashboard_button.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
+        
+        #set serch for ride button
+        self.search_for_ride_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="Search for Ride",
+                                            fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
+                                            anchor="w",command=self.show_search_for_ride)
+        self.search_for_ride_button.grid(row=1, column=0, sticky="ew", padx=10, pady=10)
+        
+        #set create ride button
+        self.create_ride_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="Create Ride",
+                                            fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
+                                            anchor="w",command=self.show_create_ride)
+        self.create_ride_button.grid(row=2, column=0, sticky="ew", padx=10, pady=10)
+        
+        #set my rides button
+        self.my_rides_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="My Rides",
+                                            fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
+                                            anchor="w",command=self.show_my_rides)
+        self.my_rides_button.grid(row=3, column=0, sticky="ew", padx=10, pady=10)
+
+
+        #set feedback button
+        self.feedback_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="Feedback",
+                                            fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
+                                            anchor="w",command=self.show_feedback)
+        self.feedback_button.grid(row=4, column=0, sticky="ew", padx=10, pady=10)
+        
+
+        # #set logout button
+        # self.logout_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="Logout",
+        #                                     fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
+        #                                     anchor="w",command=self.show_welcome)
+        # self.login_button.grid(row=6, column=0, sticky="s")
+
+        #set dashboard frame
+        self.dashboard_frame = ctk.CTkFrame(self, bg_color="red", corner_radius=0)
+        self.dashboard_frame.columnconfigure(0, weight=1)
+
+        #set dashboard label
+        self.dashboard_label = ctk.CTkLabel(self.dashboard_frame, text="Dashboard", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.dashboard_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        #set search for ride frame
+        self.search_for_ride_frame = ctk.CTkFrame(self, bg_color="green", corner_radius=0)
+
+        #set search for ride label
+        self.search_for_ride_label = ctk.CTkLabel(self.search_for_ride_frame, text="Search for Ride", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.search_for_ride_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        #set create ride frame
+        self.create_ride_frame = ctk.CTkFrame(self.home_page_frame, bg_color="yellow", corner_radius=0)
+
+        #set create ride label
+        self.create_ride_label = ctk.CTkLabel(self.create_ride_frame, text="Create Ride", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.create_ride_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        #set my rides frame
+        self.my_rides_frame = ctk.CTkFrame(self, bg_color="purple", corner_radius=0)
+
+        #set my rides label
+        self.my_rides_label = ctk.CTkLabel(self.my_rides_frame, text="My Rides", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.my_rides_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        #set feedback frame
+        self.feedback_frame = ctk.CTkFrame(self, bg_color="orange", corner_radius=0)
+
+        #set feedback label
+        self.feedback_label = ctk.CTkLabel(self.feedback_frame, text="Feedback", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.feedback_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        #set navigation button commands
+        self.dashboard_button.configure(command=self.show_dashboard)
+        self.search_for_ride_button.configure(command=self.show_search_for_ride)
+        self.create_ride_button.configure(command=self.show_create_ride)
+        self.my_rides_button.configure(command=self.show_my_rides)
+        self.feedback_button.configure(command=self.show_feedback)
+        # self.logout_button.configure(command=self.show_welcome)
+
+
+        #select default frame
+        self.select_home_page_frame("dashboard")
+
+
+    def show_dashboard(self):
+        self.select_home_page_frame("dashboard")
+
+    def show_search_for_ride(self):
+        self.select_home_page_frame("search_for_ride")
+
+    def show_create_ride(self):
+        self.select_home_page_frame("create_ride")
+
+    def show_my_rides(self):
+        self.select_home_page_frame("my_rides")
+
+    def show_feedback(self):
+        self.select_home_page_frame("feedback")
+
+    def select_home_page_frame(self, frame_name):
+        
+        self.dashboard_button.configure(fg_color=("gray75","gray25") if frame_name == "dashboard" else "transparent")
+        self.search_for_ride_button.configure(fg_color=("gray75","gray25") if frame_name == "search_for_ride" else "transparent")
+        self.create_ride_button.configure(fg_color=("gray75","gray25") if frame_name == "create_ride" else "transparent")
+        self.my_rides_button.configure(fg_color=("gray75","gray25") if frame_name == "my_rides" else "transparent")
+        self.feedback_button.configure(fg_color=("gray75","gray25") if frame_name == "feedback" else "transparent")
+
+
+        if frame_name == "dashboard":
+            self.dashboard_frame.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.dashboard_frame.grid_forget()
+
+        if frame_name == "search_for_ride":
+            self.search_for_ride_frame.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.search_for_ride_frame.grid_forget()
+
+        if frame_name == "create_ride":
+            self.create_ride_frame.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.create_ride_frame.grid_forget()
+        
+        if frame_name == "my_rides":
+            self.my_rides_frame.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.my_rides_frame.grid_forget()
+
+        if frame_name == "feedback":
+            self.feedback_frame.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.feedback_frame.grid_forget()
+
 
     def show_register(self):
         self.clear_content()
         self.geometry("600x750")
         self.use_gmail_var = tk.BooleanVar()
 
-
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal",progress_color="green")   # Use default style for input fields
+        self.progress_bar.step(1)
+        self.progress_bar.pack(pady=5)
 
         #create labels and entry fields and place them side by side using grid
         self.first_name_label = ctk.CTkLabel(self, text="First Name:", fg_color="transparent", font=("Helvetica", 14, "bold"))
@@ -95,8 +255,14 @@ class View(ctk.CTk):
         self.username_entry = ctk.CTkEntry(self, fg_color="transparent", font=("Helvetica", 14, "bold"))
         self.username_entry.pack(pady=5)
 
+        
         self.phone_label = ctk.CTkLabel(self, text="Phone Number:", fg_color="transparent", font=("Helvetica", 14, "bold"))
         self.phone_label.pack(pady=5)
+
+        self.phone_extensions=["+1", "+44", "+91", "+33"]
+        self.phone_extension_combobox = ctk.CTkComboBox(self, values=self.phone_extensions)
+        self.phone_extension_combobox.pack(pady=5)
+        
 
         self.phone_entry = ctk.CTkEntry(self, fg_color="transparent", font=("Helvetica", 14, "bold"))
         self.phone_entry.pack(pady=5)
@@ -144,6 +310,7 @@ class View(ctk.CTk):
         last_name = self.last_name_entry.get()
         use_gmail = self.use_gmail_var.get()
         username = self.username_entry.get()
+        phone_extension = self.phone_extension_combobox.get()
         phone_number = self.phone_number_entry.get()
         dob = self.dob_entry.get()
 
@@ -157,13 +324,13 @@ class View(ctk.CTk):
             username = username + "@gmail.com"
 
         # Combine phone extension and phone number
-        complete_phone_number =phone_number
+        complete_phone_number =phone_extension +phone_number
 
         # Register the user (you may call your registration function here)
         # Example: self.controller.registerUser(first_name, last_name, username, complete_phone_number, dob)
 
         # Display a success message or handle registration result
-        registration_result = self.controller.registerUser(first_name, last_name, username, complete_phone_number, dob)
+        registration_result = self.controller.registerUser(first_name, last_name, use_gmail, username,complete_phone_number, dob)
         if registration_result:
             messagebox.showinfo("Success", "User registered successfully.")
         else:

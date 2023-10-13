@@ -14,8 +14,8 @@ class Controller:
         # self.view= View.View()
 
 
-    def registerUser(self,first_name, last_name, username, complete_phone_number, dob):
-        return self.model.insertUser(first_name, last_name, username, complete_phone_number, dob)
+    def registerUser(self,first_name, last_name,gmail, username, complete_phone_number, dob):
+        return self.model.insertUser(first_name, last_name,gmail, username, complete_phone_number, dob)
 
 
     def sendOtp(self,phoneNumber):
