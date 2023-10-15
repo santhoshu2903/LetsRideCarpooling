@@ -263,7 +263,7 @@ class View(ctk.CTk):
         self.use_gmail_var = tk.BooleanVar()
 
         self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal",progress_color="green")   # Use default style for input fields
-        self.progress_bar.step(1)
+        self.progress_bar.step()
         self.progress_bar.pack(pady=5)
 
         #create labels and entry fields and place them side by side using grid
@@ -303,8 +303,8 @@ class View(ctk.CTk):
         self.phone_extension_combobox.pack(pady=5)
         
 
-        self.phone_entry = ctk.CTkEntry(self, fg_color="transparent", font=("Helvetica", 14, "bold"))
-        self.phone_entry.pack(pady=5)
+        self.phone_number_entry = ctk.CTkEntry(self, fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.phone_number_entry.pack(pady=5)
 
         self.user_type_label = ctk.CTkLabel(self, text="User Type:", fg_color="transparent", font=("Helvetica", 14, "bold"))
         self.user_type_label.pack(pady=5)
@@ -363,7 +363,7 @@ class View(ctk.CTk):
             username = username + "@gmail.com"
 
         # Combine phone extension and phone number
-        complete_phone_number =phone_extension +phone_number
+        complete_phone_number = phone_extension +phone_number
 
         # Register the user (you may call your registration function here)
         # Example: self.controller.registerUser(first_name, last_name, username, complete_phone_number, dob)
