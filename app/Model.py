@@ -49,6 +49,15 @@ class Model:
             );
             ''')
 
+    def add_ride(self, from_location, to_location, date, time):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO rides (from_location, to_location, date, time)
+                VALUES (?, ?, ?, ?)
+            ''', (from_location, to_location, date, time))
+            ride_id = cursor.lastrowid
+        return ride_id
 
     def get_all_rides(self):
         with sqlite3.connect(self.db_name) as conn:
@@ -66,6 +75,17 @@ class Model:
                 SELECT * FROM users
                 WHERE username = ?
             ''', (username,))
+            user_data = cursor.fetchone()
+            return user_data
+        
+
+    def get_User_by_phone_number(self, phone_number):
+        with sqlite3.connect(self.users_db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT * FROM users
+                WHERE phone_number = ?
+            ''', (phone_number,))
             user_data = cursor.fetchone()
             return user_data
         

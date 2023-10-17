@@ -16,7 +16,15 @@ class Controller:
 
     def registerUser(self,first_name, last_name,gmail, username, complete_phone_number, dob):
         return self.model.insertUser(first_name, last_name,gmail, username, complete_phone_number, dob)
+    
 
+    def add_ride(self, from_location, to_location, date, time):
+        return self.model.add_ride(from_location, to_location, date, time)
+    
+    def get_current_user_object(self,phone_number):
+        return self.model.get_User_by_phone_number(phone_number)    
+
+    
 
     def sendOtp(self,phoneNumber):
         

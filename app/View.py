@@ -8,9 +8,11 @@ from tkinter import font
 from tkcalendar import DateEntry
 import CTkTable  as ctkTable
 
+
 class View(ctk.CTk):
     def __init__(self):
         super().__init__()
+        self.frame = {}
         self.title("Let's Go Ride with US")
         # self.iconphoto(False, tk.PhotoImdsage(file='images/icon.jpg'))
         self.controller = Controller.Controller()
@@ -52,6 +54,7 @@ class View(ctk.CTk):
         self.otp_entry = ctk.CTkEntry(self, fg_color="transparent", font=("Helvetica", 14, "bold"))
         self.otp_entry.pack(pady=10)
 
+
         self.send_otp_button = ctk.CTkButton(self, text="Send OTP", command=self.sendOtpRequest)
         self.send_otp_button.pack(pady=10)
 
@@ -62,9 +65,28 @@ class View(ctk.CTk):
         self.back_button.pack(pady=10)
 
 
+    def show_home_page_frame(self,frame_name):
+
+        #hide all frames    
+        for frame in self.frame.values():
+            frame.grid_forget()
+
+        #show selected frame
+        self.dashboard_button.configure(fg_color=("gray75","gray25") if frame_name == "dashboard" else "transparent")
+        self.search_for_ride_button.configure(fg_color=("gray75","gray25") if frame_name == "search_for_ride" else "transparent")
+        self.give_ride_button.configure(fg_color=("gray75","gray25") if frame_name == "give_ride" else "transparent")
+        self.my_rides_button.configure(fg_color=("gray75","gray25") if frame_name == "my_rides" else "transparent")
+        self.feedback_button.configure(fg_color=("gray75","gray25") if frame_name == "feedback" else "transparent")
+
+        self.frame[frame_name].grid(row=0, column=1, sticky="nsew")
+
     def home_page(self):
         self.clear_content()
         self.geometry("1000x600")
+
+
+        #store current user name
+        # self.current_user_object = self.controller.get_current_user_object()
 
 
         #set grid layout
@@ -85,32 +107,32 @@ class View(ctk.CTk):
         #set dashboard button
         self.dashboard_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="DashBoard",
                                          fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
-                                         anchor="w",command=self.show_dashboard)
+                                         anchor="w",command=lambda : self.show_home_page_frame("dashboard"))
         self.dashboard_button.grid(row=0, column=0, sticky="ew")
         
         #set serch for ride button
         self.search_for_ride_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="Search for Ride",
                                             fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
-                                            anchor="w",command=self.show_search_for_ride)
+                                            anchor="w",command=lambda: self.show_home_page_frame("search_for_ride"))
         self.search_for_ride_button.grid(row=1, column=0, sticky="ew")
         
         #set create ride button
         self.give_ride_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="Give Ride",
                                             fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
-                                            anchor="w",command=self.show_give_ride)
+                                            anchor="w",command=lambda:self.show_home_page_frame("give_ride")   )
         self.give_ride_button.grid(row=2, column=0, sticky="ew")
         
         #set my rides button
         self.my_rides_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="My Rides",
                                             fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
-                                            anchor="w",command=self.show_my_rides)
+                                            anchor="w",command=lambda:self.show_home_page_frame("my_rides"))
         self.my_rides_button.grid(row=3, column=0, sticky="ew")
 
 
         #set feedback button
         self.feedback_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="Feedback",
                                             fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
-                                            anchor="w",command=self.show_feedback)
+                                            anchor="w",command=lambda:self.show_home_page_frame("feedback"))
         self.feedback_button.grid(row=4, column=0, sticky="ew")
         
 
@@ -119,151 +141,126 @@ class View(ctk.CTk):
         self.logout_button.grid(row=5, column=0, sticky="sew", padx=10, pady=10)
 
 
+        #create dashboard frame as frame["dashboard"]
+        self.frame["dashboard"] = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
+        self.frame["dashboard"].columnconfigure(0, weight=1)
 
-
-        #set dashboard frame
-        self.dashboard_frame = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
-        self.dashboard_frame.columnconfigure(0, weight=1)
-
-        #set dashboard label
-        self.dashboard_label = ctk.CTkLabel(self.dashboard_frame, text="Dashboard", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        #create dashboard label
+        self.dashboard_label = ctk.CTkLabel(self.frame["dashboard"], text="Dashboard", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.dashboard_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
-        #set search for ride frame
-        self.search_for_ride_frame = ctk.CTkFrame(self,fg_color="transparent" ,corner_radius=0)
-        self.search_for_ride_frame.columnconfigure(0, weight=1)
+        #create search for ride frame as frame["search_for_ride"]
+        self.frame["search_for_ride"] = ctk.CTkFrame(self,fg_color="transparent" ,corner_radius=0)
+        self.frame["search_for_ride"].columnconfigure(0, weight=1)
 
-        #set search for ride label
-        self.search_for_ride_label = ctk.CTkLabel(self.search_for_ride_frame, text="Search for Ride", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        #create search for ride label
+        self.search_for_ride_label = ctk.CTkLabel(self.frame["search_for_ride"], text="Search for Ride", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.search_for_ride_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
-        #set create ride frame
-        self.give_ride = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
-        self.give_ride.columnconfigure(0, weight=1)
-
-        #set new ride frame
-        self.new_ride_frame = ctk.CTkFrame(self.give_ride, fg_color="transparent", corner_radius=0)
-        self.new_ride_frame.columnconfigure(0, weight=1)
+        #create create ride frame as frame["give_ride"]
+        self.frame["give_ride"] = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
+        self.frame["give_ride"].columnconfigure(0, weight=1)
 
 
-        #set create ride button top right corner
-        self.create_ride_button = ctk.CTkButton(self.give_ride, text="+ New Ride",command=self.show_new_ride_frame)
+        #create create ride button top right corner
+        self.create_ride_button = ctk.CTkButton(self.frame["give_ride"], text="+ New Ride",command=lambda :  self.show_home_page_frame("new_ride"))
         self.create_ride_button.grid(row=0, column=5, sticky="nw", padx=30, pady=30)
 
-        # #set frame search bar for my rides
-        self.give_ride_search_bar_frame = ctk.CTkFrame(self.give_ride, height=50, fg_color="transparent", corner_radius=0)
-        self.give_ride_search_bar_frame.pack(fill="x", padx=27, pady=(45,0))
+        #create new ride frame as frame["new_ride"]
+        self.frame["new_ride"] = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
+        self.frame["new_ride"].columnconfigure(1, weight=1)
+
+
+        #Insert new ride frame elements
+        #create Add new ride heading
+        self.new_ride_label = ctk.CTkLabel(self.frame["new_ride"], text="Add New Ride", fg_color="transparent", font=("Helvetica", 25, "bold"))
+        self.new_ride_label.grid(row=0, column=1, sticky="w", padx=10, pady=10)
+
+        #rider name label
+        self.rider_name_label = ctk.CTkLabel(self.frame["new_ride"], text="Rider Name:", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.rider_name_label.grid(row=1, column=0, sticky="e", padx=10, pady=10)
+
+        #rider name entry display current signed in username
+        self.rider_name_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
+        self.rider_name_entry.grid(row=1, column=1, sticky="w", padx=10, pady=10)
+
+        #set rider name entry to current signed in username from current_user_object
+        self.rider_name_entry.insert(0, "Test Ride Name")
+
+        #create from location label and entry side by side
+        self.from_location_label = ctk.CTkLabel(self.frame["new_ride"], text="From Location:", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.from_location_label.grid(row=2, column=0, sticky="e", padx=10, pady=10)
+
+        self.from_location_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
+        self.from_location_entry.grid(row=2, column=1, sticky="w", padx=10, pady=10,columnspan=2)
+
+        #create to location label and entry side by side
+        self.to_location_label = ctk.CTkLabel(self.frame["new_ride"], text="To Location:", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.to_location_label.grid(row=3, column=0, sticky="e", padx=10, pady=10)
+
+        self.to_location_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
+        self.to_location_entry.grid(row=3, column=1, sticky="w", padx=10, pady=10)
+
+        # #create date label and entry side by side
+        # self.date_label = ctk.CTkLabel(self.frame["new_ride"], text="Date:", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        # self.date_label.grid(row=3, column=0, sticky="nsew", padx=10, pady=10)
+
+        # self.date_entry =DateEntry(self.frame["new_ride"], width=18,background="darkblue", foreground="white", date_pattern="MM/dd/yyyy", font=("Arial", 15))
+        # self.date_entry.grid(row=3, column=1, sticky="nsew", padx=10, pady=10)
+
+        #create time label and entry side by side
+        self.time_label = ctk.CTkLabel(self.frame["new_ride"], text="Time:", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.time_label.grid(row=4, column=0, sticky="e", padx=10, pady=10)
+
+        self.time_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
+        self.time_entry.grid(row=4, column=1, sticky="w", padx=10, pady=10)
+
+        #create submit button
+        self.submit_button = ctk.CTkButton(self.frame["new_ride"], text="Submit",command=self.controller.add_ride)
+        self.submit_button.grid(row=5, column=1, sticky="w", padx=10, pady=10)
+
+        #create back button to create rides frame  
+        self.back_button = ctk.CTkButton(self.frame["new_ride"], text="Back",command=lambda :  self.show_home_page_frame("give_ride"))
+        self.back_button.grid(row=6, column=1, sticky="w", padx=10, pady=10)
+
+        
+
+
+
+
+
+        # #create frame search bar for my rides
+        # self.give_ride_search_bar_frame = ctk.CTkFrame(self.frame["give_ride"], height=50, fg_color="transparent", corner_radius=0)
+        # self.give_ride_search_bar_frame.columnconfigure(0, weight=1,fg_color="light blue")
 
         # #search bar entry from location
-        # self.give_ride_search_bar_entry = ctk.CTkEntry(self.give_ride_search_bar_frame,width=150, placeholder_text="from ").pack(side="left", padx=(13,0), pady=15) 
-
-        # #search bar entry to location
+        # self.give_ride_search_bar_entry = ctk.CTkEntry(self.give_ride_search_bar_frame,width=150, placeholder_text="from ").pack(side="left", padx=(13,0), pady=15)
         # self.give_ride_search_bar_entry = ctk.CTkEntry(self.give_ride_search_bar_frame,width=150, placeholder_text="to").pack(side="left", padx=(13,0), pady=15)
 
         # #search bar entry date
         # self.give_ride_search_bar_entry = ctk.CTkEntry(self.give_ride_search_bar_frame,width=150, placeholder_text="date").pack(side="left", padx=(13,0), pady=15)
+        # self.give_ride_search_bar_entry = ctk.CTkEntry(self.give_ride_search_bar_frame,width=150, placeholder_text="time").pack(side="left", padx=(13,0), pady=15)
 
-        
+        #create my rides frame as frame["my_rides"]
+        self.frame["my_rides"] = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
+        self.frame["my_rides"].columnconfigure(0, weight=1)
 
-        #set my rides frame
-        self.my_rides_frame = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
-        self.my_rides_frame.columnconfigure(0, weight=1)
-
-        #set my rides label
-        self.my_rides_label = ctk.CTkLabel(self.my_rides_frame, text="My Rides", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        #create my rides label
+        self.my_rides_label = ctk.CTkLabel(self.frame["my_rides"], text="My Rides", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.my_rides_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
-        #set feedback frame
-        self.feedback_frame = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
-        self.feedback_frame.columnconfigure(0, weight=1)
+        #create feedback frame as frame["feedback"]
+        self.frame["feedback"] = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
+        self.frame["feedback"].columnconfigure(0, weight=1)
 
-        #set feedback label
-        self.feedback_label = ctk.CTkLabel(self.feedback_frame, text="Feedback", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        #create feedback label
+        self.feedback_label = ctk.CTkLabel(self.frame["feedback"], text="Feedback", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.feedback_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
 
+        #show dashboard frame as default frame
+        self.show_home_page_frame("dashboard")
 
-
-        #select default frame
-        self.select_home_page_frame("dashboard")
-
-
-
-    def show_new_ride_frame(self):
-        self.select_home_page_frame("new_ride")
-
-    def show_dashboard(self):
-        self.select_home_page_frame("dashboard")
-
-    def show_search_for_ride(self):
-        self.select_home_page_frame("search_for_ride")
-
-    def show_give_ride(self):
-        self.select_home_page_frame("give_ride")
-
-    def show_my_rides(self):
-        self.select_home_page_frame("my_rides")
-
-    def show_feedback(self):
-        self.select_home_page_frame("feedback")
-
-    def select_home_page_frame(self, frame_name):
-        
-        self.dashboard_button.configure(fg_color=("gray75","gray25") if frame_name == "dashboard" else "transparent")
-        self.search_for_ride_button.configure(fg_color=("gray75","gray25") if frame_name == "search_for_ride" else "transparent")
-        self.give_ride_button.configure(fg_color=("gray75","gray25") if frame_name == "give_ride" or frame_name=="new_ride" else "transparent")
-        self.my_rides_button.configure(fg_color=("gray75","gray25") if frame_name == "my_rides" else "transparent")
-        self.feedback_button.configure(fg_color=("gray75","gray25") if frame_name == "feedback" else "transparent")
-
-
-        if frame_name == "dashboard":
-            self.dashboard_frame.grid(row=0, column=1, sticky="nsew")
-            self.clear_frame(self.search_for_ride_frame)
-            self.clear_frame(self.give_ride)
-            self.clear_frame(self.my_rides_frame)
-            self.clear_frame(self.feedback_frame)
-            self.clear_frame(self.new_ride_frame)
-
-        if frame_name == "search_for_ride":
-            self.search_for_ride_frame.grid(row=0, column=1, sticky="nsew")
-            self.clear_frame(self.dashboard_frame)
-            self.clear_frame(self.give_ride)
-            self.clear_frame(self.my_rides_frame)
-            self.clear_frame(self.feedback_frame)
-            self.clear_frame(self.new_ride_frame)
-        
-        if frame_name == "new_ride":
-            self.new_ride_frame.grid(row=1, column=0, sticky="nsew")
-            self.clear_frame(self.dashboard_frame)
-            self.clear_frame(self.search_for_ride_frame)
-            self.clear_frame(self.give_ride)
-            self.clear_frame(self.my_rides_frame)
-            self.clear_frame(self.feedback_frame)
-
-        if frame_name == "give_ride":
-            self.give_ride.grid(row=0, column=1, sticky="nsew")
-            self.clear_frame(self.dashboard_frame)
-            self.clear_frame(self.search_for_ride_frame)
-            self.clear_frame(self.my_rides_frame)
-            self.clear_frame(self.feedback_frame)
-            self.clear_frame(self.new_ride_frame)
-
-        if frame_name == "my_rides":
-            self.my_rides_frame.grid(row=0, column=1, sticky="nsew")
-            self.clear_frame(self.dashboard_frame)
-            self.clear_frame(self.search_for_ride_frame)
-            self.clear_frame(self.give_ride)
-            self.clear_frame(self.feedback_frame)
-            self.clear_frame(self.new_ride_frame)
-
-
-        if frame_name == "feedback":
-            self.feedback_frame.grid(row=0, column=1, sticky="nsew")
-            self.clear_frame(self.dashboard_frame)
-            self.clear_frame(self.search_for_ride_frame)
-            self.clear_frame(self.give_ride)
-            self.clear_frame(self.my_rides_frame)
-            self.clear_frame(self.new_ride_frame)
 
 
     def clear_frame(self, frame):
@@ -276,7 +273,7 @@ class View(ctk.CTk):
         self.geometry("600x750")
         self.use_gmail_var = tk.BooleanVar()
 
-        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal",progress_color="green")   # Use default style for input fields
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal",progress_color="light blue")   # Use default style for input fields
         self.progress_bar.step()
         self.progress_bar.pack(pady=5)
 
@@ -390,4 +387,5 @@ class View(ctk.CTk):
             messagebox.showerror("Error", "Error registering user.")
 
     def sendOtpRequest(self):
+        # self.current_user_phone_number = self.phone_number_entry.get()
         pass
