@@ -79,6 +79,7 @@ class View(ctk.CTk):
         self.navigation_frame.grid_rowconfigure(5, weight=1)
 
 
+
         #set navigation buttons
 
         #set dashboard button
@@ -94,10 +95,10 @@ class View(ctk.CTk):
         self.search_for_ride_button.grid(row=1, column=0, sticky="ew")
         
         #set create ride button
-        self.create_ride_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="Create Ride",
+        self.give_ride_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="Give Ride",
                                             fg_color="transparent", text_color=("gray10","gray90"),hover_color=("gray70","gray30"),
-                                            anchor="w",command=self.show_create_ride)
-        self.create_ride_button.grid(row=2, column=0, sticky="ew")
+                                            anchor="w",command=self.show_give_ride)
+        self.give_ride_button.grid(row=2, column=0, sticky="ew")
         
         #set my rides button
         self.my_rides_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40,border_spacing=10, text="My Rides",
@@ -137,19 +138,32 @@ class View(ctk.CTk):
         self.search_for_ride_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
         #set create ride frame
-        self.create_ride_frame = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
-        self.create_ride_frame.columnconfigure(0, weight=1)
+        self.give_ride = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
+        self.give_ride.columnconfigure(0, weight=1)
 
         #set new ride frame
-        self.new_ride_frame = ctk.CTkFrame(self.create_ride_frame, fg_color="transparent", corner_radius=0)
+        self.new_ride_frame = ctk.CTkFrame(self.give_ride, fg_color="transparent", corner_radius=0)
         self.new_ride_frame.columnconfigure(0, weight=1)
 
 
         #set create ride button top right corner
-        self.create_ride_button = ctk.CTkButton(self.create_ride_frame, text="+ New Ride",command=self.show_new_ride_frame)
+        self.create_ride_button = ctk.CTkButton(self.give_ride, text="+ New Ride",command=self.show_new_ride_frame)
         self.create_ride_button.grid(row=0, column=5, sticky="nw", padx=30, pady=30)
 
+        # #set frame search bar for my rides
+        self.give_ride_search_bar_frame = ctk.CTkFrame(self.give_ride, height=50, fg_color="transparent", corner_radius=0)
+        self.give_ride_search_bar_frame.pack(fill="x", padx=27, pady=(45,0))
 
+        # #search bar entry from location
+        # self.give_ride_search_bar_entry = ctk.CTkEntry(self.give_ride_search_bar_frame,width=150, placeholder_text="from ").pack(side="left", padx=(13,0), pady=15) 
+
+        # #search bar entry to location
+        # self.give_ride_search_bar_entry = ctk.CTkEntry(self.give_ride_search_bar_frame,width=150, placeholder_text="to").pack(side="left", padx=(13,0), pady=15)
+
+        # #search bar entry date
+        # self.give_ride_search_bar_entry = ctk.CTkEntry(self.give_ride_search_bar_frame,width=150, placeholder_text="date").pack(side="left", padx=(13,0), pady=15)
+
+        
 
         #set my rides frame
         self.my_rides_frame = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
@@ -184,8 +198,8 @@ class View(ctk.CTk):
     def show_search_for_ride(self):
         self.select_home_page_frame("search_for_ride")
 
-    def show_create_ride(self):
-        self.select_home_page_frame("create_ride")
+    def show_give_ride(self):
+        self.select_home_page_frame("give_ride")
 
     def show_my_rides(self):
         self.select_home_page_frame("my_rides")
@@ -197,7 +211,7 @@ class View(ctk.CTk):
         
         self.dashboard_button.configure(fg_color=("gray75","gray25") if frame_name == "dashboard" else "transparent")
         self.search_for_ride_button.configure(fg_color=("gray75","gray25") if frame_name == "search_for_ride" else "transparent")
-        self.create_ride_button.configure(fg_color=("gray75","gray25") if frame_name == "create_ride" or "new_ride" else "transparent")
+        self.give_ride_button.configure(fg_color=("gray75","gray25") if frame_name == "give_ride" or frame_name=="new_ride" else "transparent")
         self.my_rides_button.configure(fg_color=("gray75","gray25") if frame_name == "my_rides" else "transparent")
         self.feedback_button.configure(fg_color=("gray75","gray25") if frame_name == "feedback" else "transparent")
 
@@ -205,7 +219,7 @@ class View(ctk.CTk):
         if frame_name == "dashboard":
             self.dashboard_frame.grid(row=0, column=1, sticky="nsew")
             self.clear_frame(self.search_for_ride_frame)
-            self.clear_frame(self.create_ride_frame)
+            self.clear_frame(self.give_ride)
             self.clear_frame(self.my_rides_frame)
             self.clear_frame(self.feedback_frame)
             self.clear_frame(self.new_ride_frame)
@@ -213,7 +227,7 @@ class View(ctk.CTk):
         if frame_name == "search_for_ride":
             self.search_for_ride_frame.grid(row=0, column=1, sticky="nsew")
             self.clear_frame(self.dashboard_frame)
-            self.clear_frame(self.create_ride_frame)
+            self.clear_frame(self.give_ride)
             self.clear_frame(self.my_rides_frame)
             self.clear_frame(self.feedback_frame)
             self.clear_frame(self.new_ride_frame)
@@ -222,12 +236,12 @@ class View(ctk.CTk):
             self.new_ride_frame.grid(row=1, column=0, sticky="nsew")
             self.clear_frame(self.dashboard_frame)
             self.clear_frame(self.search_for_ride_frame)
-            self.clear_frame(self.create_ride_frame)
+            self.clear_frame(self.give_ride)
             self.clear_frame(self.my_rides_frame)
             self.clear_frame(self.feedback_frame)
 
-        if frame_name == "create_ride":
-            self.create_ride_frame.grid(row=0, column=1, sticky="nsew")
+        if frame_name == "give_ride":
+            self.give_ride.grid(row=0, column=1, sticky="nsew")
             self.clear_frame(self.dashboard_frame)
             self.clear_frame(self.search_for_ride_frame)
             self.clear_frame(self.my_rides_frame)
@@ -238,7 +252,7 @@ class View(ctk.CTk):
             self.my_rides_frame.grid(row=0, column=1, sticky="nsew")
             self.clear_frame(self.dashboard_frame)
             self.clear_frame(self.search_for_ride_frame)
-            self.clear_frame(self.create_ride_frame)
+            self.clear_frame(self.give_ride)
             self.clear_frame(self.feedback_frame)
             self.clear_frame(self.new_ride_frame)
 
@@ -247,7 +261,7 @@ class View(ctk.CTk):
             self.feedback_frame.grid(row=0, column=1, sticky="nsew")
             self.clear_frame(self.dashboard_frame)
             self.clear_frame(self.search_for_ride_frame)
-            self.clear_frame(self.create_ride_frame)
+            self.clear_frame(self.give_ride)
             self.clear_frame(self.my_rides_frame)
             self.clear_frame(self.new_ride_frame)
 
