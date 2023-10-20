@@ -6,9 +6,11 @@ USERS_DB =os.path.join(DATABASE_DIR,"users.db")
 RIDES_DB =os.path.join(DATABASE_DIR,"rides.db")
 
 class Model:
-    def __init__(self,users_db_path =USERS_DB):
+    def __init__(self,users_db_path =USERS_DB,rides_db=RIDES_DB):
         self.users_db_path = users_db_path
+        self.rides_db_path = rides_db
         self.init_users_db()
+        self.init_rides_db()
 
 
     def init_users_db(self):
@@ -42,6 +44,7 @@ class Model:
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS rides (
                 rideid INTEGER PRIMARY KEY AUTOINCREMENT,
+                riderid INTEGER NOT NULL,
                 from_location TEXT NOT NULL,
                 to_location TEXT NOT NULL,
                 date TEXT NOT NULL,
@@ -49,13 +52,11 @@ class Model:
             );
             ''')
 
-    def add_ride(self, from_location, to_location, date, time):
+    #add ride method, adds riderid, from_location, to_location, date, time to model
+    def add_ride(self,riderid, from_location, to_location, date, time):
         with sqlite3.connect(self.db_name) as conn:
             cursor = conn.cursor()
-            cursor.execute('''
-                INSERT INTO rides (from_location, to_location, date, time)
-                VALUES (?, ?, ?, ?)
-            ''', (from_location, to_location, date, time))
+            cursor.execute('''INSERT INTO rides (riderid,from_location, to_location, date, time) VALUES (?, ?, ?, ?)''', (riderid,from_location, to_location, date, time))
             ride_id = cursor.lastrowid
         return ride_id
 
@@ -123,13 +124,13 @@ class Model:
             return user_data
         
         
-    def add_ride(self, from_location, to_location, date, time):
-        with sqlite3.connect(self.db_name) as conn:
+    def add_ride(self,riderid, from_location, to_location, date, time):
+        with sqlite3.connect(self.rides_db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO rides (from_location, to_location, date, time)
-                VALUES (?, ?, ?, ?)
-            ''', (from_location, to_location, date, time))
+                INSERT INTO rides (riderid,from_location, to_location, date, time)
+                VALUES (?,?, ?, ?, ?)
+            ''', (riderid,from_location, to_location, date, time))
             ride_id = cursor.lastrowid
         return ride_id
     

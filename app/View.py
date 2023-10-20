@@ -5,7 +5,7 @@ import customtkinter as ctk
 import Controller
 import tkinter.ttk as ttk
 from tkinter import font
-from tkcalendar import DateEntry
+from tkcalendar import Calendar, DateEntry
 import CTkTable  as ctkTable
 
 
@@ -28,7 +28,7 @@ class View(ctk.CTk):
         self.ctk_label.pack(pady=40)
 
         # self.login_button = ctk.CTkButton(self, text="Login", command=self.show_login)
-        self.login_button = ctk.CTkButton(self, text="Login", command=self.home_page)
+        self.login_button = ctk.CTkButton(self, text="Login", command=self.show_login)
         self.login_button.pack(pady=20)
 
         self.register_button = ctk.CTkButton(self, text="Register", command=self.show_register)
@@ -58,7 +58,8 @@ class View(ctk.CTk):
         self.send_otp_button = ctk.CTkButton(self, text="Send OTP", command=self.sendOtpRequest)
         self.send_otp_button.pack(pady=10)
 
-        self.login_button = ctk.CTkButton(self, text="Login", command=self.controller.verify_login)
+        # self.login_button = ctk.CTkButton(self, text="Login", command=self.controller.verify_login)
+        self.login_button = ctk.CTkButton(self, text="Login", command=self.home_page)
         self.login_button.pack(pady=10)
 
         self.back_button = ctk.CTkButton(self, text="Back", command=self.show_welcome)
@@ -177,7 +178,7 @@ class View(ctk.CTk):
         self.new_ride_label.grid(row=0, column=1, sticky="w", padx=10, pady=10)
 
         #rider name label
-        self.rider_name_label = ctk.CTkLabel(self.frame["new_ride"], text="Rider Name:", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.rider_name_label = ctk.CTkLabel(self.frame["new_ride"], text="Rider Name : ", fg_color="transparent", font=("Helvetica", 14, "bold"))
         self.rider_name_label.grid(row=1, column=0, sticky="e", padx=10, pady=10)
 
         #rider name entry display current signed in username
@@ -188,40 +189,44 @@ class View(ctk.CTk):
         self.rider_name_entry.insert(0, "Test Ride Name")
 
         #create from location label and entry side by side
-        self.from_location_label = ctk.CTkLabel(self.frame["new_ride"], text="From Location:", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.from_location_label = ctk.CTkLabel(self.frame["new_ride"], text="From Location : ", fg_color="transparent", font=("Helvetica", 14, "bold"))
         self.from_location_label.grid(row=2, column=0, sticky="e", padx=10, pady=10)
 
         self.from_location_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
         self.from_location_entry.grid(row=2, column=1, sticky="w", padx=10, pady=10,columnspan=2)
 
         #create to location label and entry side by side
-        self.to_location_label = ctk.CTkLabel(self.frame["new_ride"], text="To Location:", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.to_location_label = ctk.CTkLabel(self.frame["new_ride"], text="To Location : ", fg_color="transparent", font=("Helvetica", 14, "bold"))
         self.to_location_label.grid(row=3, column=0, sticky="e", padx=10, pady=10)
 
         self.to_location_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
         self.to_location_entry.grid(row=3, column=1, sticky="w", padx=10, pady=10)
 
         # #create date label and entry side by side
-        # self.date_label = ctk.CTkLabel(self.frame["new_ride"], text="Date:", fg_color="transparent", font=("Helvetica", 14, "bold"))
-        # self.date_label.grid(row=3, column=0, sticky="nsew", padx=10, pady=10)
+        self.date_label = ctk.CTkLabel(self.frame["new_ride"], text="Date : ", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.date_label.grid(row=4, column=0, sticky="e", padx=10, pady=10)
 
-        # self.date_entry =DateEntry(self.frame["new_ride"], width=18,background="darkblue", foreground="white", date_pattern="MM/dd/yyyy", font=("Arial", 15))
-        # self.date_entry.grid(row=3, column=1, sticky="nsew", padx=10, pady=10)
+        # self.date_entry =DateEntry(self.frame["new_ride"], date_pattern="MM/dd/yyyy", font=("Arial", 15))
+        # self.date_entry.grid(row=4, column=1, sticky="w", padx=10, pady=10)
+
+        self.date_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
+        self.date_entry.grid(row=4, column=1, sticky="w", padx=10, pady=10)
+
 
         #create time label and entry side by side
-        self.time_label = ctk.CTkLabel(self.frame["new_ride"], text="Time:", fg_color="transparent", font=("Helvetica", 14, "bold"))
-        self.time_label.grid(row=4, column=0, sticky="e", padx=10, pady=10)
+        self.time_label = ctk.CTkLabel(self.frame["new_ride"], text="Time : ", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.time_label.grid(row=5, column=0, sticky="e", padx=10, pady=10)
 
         self.time_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
-        self.time_entry.grid(row=4, column=1, sticky="w", padx=10, pady=10)
+        self.time_entry.grid(row=5, column=1, sticky="w", padx=10, pady=10)
 
         #create submit button
-        self.submit_button = ctk.CTkButton(self.frame["new_ride"], text="Submit",command=self.controller.add_ride)
-        self.submit_button.grid(row=5, column=1, sticky="w", padx=10, pady=10)
+        self.submit_button = ctk.CTkButton(self.frame["new_ride"], text="Submit",command=self.send_ride_data)
+        self.submit_button.grid(row=6, column=1, sticky="w", padx=10, pady=10)
 
         #create back button to create rides frame  
         self.back_button = ctk.CTkButton(self.frame["new_ride"], text="Back",command=lambda :  self.show_home_page_frame("give_ride"))
-        self.back_button.grid(row=6, column=1, sticky="w", padx=10, pady=10)
+        self.back_button.grid(row=7, column=1, sticky="w", padx=10, pady=10)
 
         
 
@@ -231,7 +236,7 @@ class View(ctk.CTk):
 
         # #create frame search bar for my rides
         # self.give_ride_search_bar_frame = ctk.CTkFrame(self.frame["give_ride"], height=50, fg_color="transparent", corner_radius=0)
-        # self.give_ride_search_bar_frame.columnconfigure(0, weight=1,fg_color="light blue")
+        # self.give_ride_search_bar_frame.columnconfigure(0, weight=1)
 
         # #search bar entry from location
         # self.give_ride_search_bar_entry = ctk.CTkEntry(self.give_ride_search_bar_frame,width=150, placeholder_text="from ").pack(side="left", padx=(13,0), pady=15)
@@ -249,6 +254,32 @@ class View(ctk.CTk):
         self.my_rides_label = ctk.CTkLabel(self.frame["my_rides"], text="My Rides", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.my_rides_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
+
+        #create search bar for created rides
+        # self.my_rides_search_bar_frame = ctk.CTkFrame(self.frame["my_rides"], height=50, fg_color="transparent", corner_radius=0)
+        # self.my_rides_search_bar_frame.columnconfigure(0, weight=1)
+
+        # #search bar entry from location
+        # self.my_rides_search_bar_entry = ctk.CTkEntry(self.my_rides_search_bar_frame,width=150, placeholder_text="from ").pack(side="left", padx=(13,0), pady=15)
+        # self.my_rides_search_bar_entry = ctk.CTkEntry(self.my_rides_search_bar_frame,width=150, placeholder_text="to").pack(side="left", padx=(13,0), pady=15)
+
+        # #search bar entry date
+        # self.my_rides_search_bar_entry = ctk.CTkEntry(self.my_rides_search_bar_frame,width=150, placeholder_text="date").pack(side="left", padx=(13,0), pady=15)
+
+        # #search bar entry time
+        # self.my_rides_search_bar_entry = ctk.CTkEntry(self.my_rides_search_bar_frame,width=150, placeholder_text="time").pack(side="left", padx=(13,0), pady=15)
+
+        # #create table for created rides
+        # self.my_rides_table_frame = ctk.CTkFrame(self.frame["my_rides"], fg_color="transparent", corner_radius=0)
+        # self.my_rides_table_frame.columnconfigure(0, weight=1)
+
+        # #create table
+        # self.my_rides_table = ctkTable.CTkTable(self.my_rides_table_frame, ["Ride ID", "Rider ID", "From Location", "To Location", "Date", "Time"], 0, 0)
+        # self.my_rides_table.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        #insert data into table
+        # self.my_rides_table.insert_data(self.controller.get_rides_by_user())
+
         #create feedback frame as frame["feedback"]
         self.frame["feedback"] = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
         self.frame["feedback"].columnconfigure(0, weight=1)
@@ -261,7 +292,21 @@ class View(ctk.CTk):
         #show dashboard frame as default frame
         self.show_home_page_frame("dashboard")
 
+    #send ride data to controller
+    def send_ride_data(self):
+        #get data from new ride frame
+        riderid = 1
+        rider_name = self.rider_name_entry.get()
+        from_location = self.from_location_entry.get()
+        to_location = self.to_location_entry.get()
+        date = self.date_entry.get()
+        time = self.time_entry.get()
 
+        #send data to controller
+        self.controller.add_ride(riderid, from_location, to_location, date, time)
+
+        #show my rides frame
+        self.show_home_page_frame("my_rides")
 
     def clear_frame(self, frame):
         if frame.winfo_children():
