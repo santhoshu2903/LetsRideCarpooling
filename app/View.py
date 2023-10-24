@@ -158,6 +158,34 @@ class View(ctk.CTk):
         self.search_for_ride_label = ctk.CTkLabel(self.frame["search_for_ride"], text="Search for Ride", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.search_for_ride_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
+        #create search bar for seach for ride using from location and to location and date
+        self.search_for_ride_search_bar_frame = ctk.CTkFrame(self.frame["search_for_ride"], height=50, fg_color="transparent", corner_radius=0)
+        self.search_for_ride_search_bar_frame.columnconfigure(0, weight=1)
+
+        #search bar entry from location
+        self.search_for_ride_search_bar_entry = ctk.CTkEntry(self.search_for_ride_search_bar_frame,width=150, placeholder_text="from ").pack(side="left", padx=(13,0), pady=15)
+        self.search_for_ride_search_bar_entry = ctk.CTkEntry(self.search_for_ride_search_bar_frame,width=150, placeholder_text="to").pack(side="left", padx=(13,0), pady=15)
+
+        #search bar entry date
+        self.search_for_ride_search_bar_entry = ctk.CTkEntry(self.search_for_ride_search_bar_frame,width=150, placeholder_text="date").pack(side="left", padx=(13,0), pady=15)
+
+        #search bar entry time
+        self.search_for_ride_search_bar_entry = ctk.CTkEntry(self.search_for_ride_search_bar_frame,width=150, placeholder_text="time").pack(side="left", padx=(13,0), pady=15)
+
+        #create table for search for ride
+        self.search_for_ride_table_frame = ctk.CTkFrame(self.frame["search_for_ride"], fg_color="transparent", corner_radius=0)
+        self.search_for_ride_table_frame.columnconfigure(0, weight=1)
+
+        #create table
+        self.search_for_ride_table = ctkTable.CTkTable(self.search_for_ride_table_frame,column=["Ride ID", "Rider ID", "From Location", "To Location", "Date", "Time"], rows=0)
+        self.search_for_ride_table.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        #insert data into table
+        self.search_for_ride_table.insert_data(self.controller.get_all_rides())
+
+        
+        
+
         #create create ride frame as frame["give_ride"]
         self.frame["give_ride"] = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         self.frame["give_ride"].columnconfigure(0, weight=1)

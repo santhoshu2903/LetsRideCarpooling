@@ -75,7 +75,12 @@ class Controller:
     
 
     def get_all_rides(self):
-        return self.model.get_all_rides()
+        rides_objects= self.model.get_all_rides()
+        rides_data =[]
+        for ride in rides_objects:
+            rides_data.append([ride[0],ride[1],ride[2],ride[3],ride[4],ride[5]])
+        return rides_data
+    
 
 
     # Add similar methods for retrieving users, handling user interactions, etc.
