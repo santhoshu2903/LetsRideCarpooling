@@ -16,52 +16,72 @@ class Model:
     def init_users_db(self):
         with sqlite3.connect(self.users_db_path) as conn:
             cursor = conn.cursor()
-        
-            # Drop the existing users table if it exists
-            cursor.execute('DROP TABLE IF EXISTS users')
-        
-            # Create a new table with the desired structure
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS users (
-                userid INTEGER PRIMARY KEY AUTOINCREMENT,
-                first_name TEXT NOT NULL,
-                last_name TEXT NOT NULL,
-                username TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL,
-                phone_number TEXT NOT NULL UNIQUE,
-                dob TEXT NOT NULL
-            );
-            ''')
+
+            # Check if the users table already exists
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users';")
+            table_exists = cursor.fetchone()
+
+            # If the users table doesn't exist, create it
+            if not table_exists:
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS users (
+                    userid INTEGER PRIMARY KEY AUTOINCREMENT,
+                    first_name TEXT NOT NULL,
+                    last_name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    username TEXT NOT NULL UNIQUE,
+                    password TEXT NOT NULL,
+                    phone_number TEXT NOT NULL UNIQUE,
+                    dob TEXT NOT NULL
+                );
+                ''')
 
     def init_rides_db(self):
         with sqlite3.connect(self.rides_db_path) as conn:
             cursor = conn.cursor()
-        
-            # Drop the existing rides table if it exists
-            cursor.execute('DROP TABLE IF EXISTS rides')
-        
-            # Create a new table with the desired structure
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS rides (
-                rideid INTEGER PRIMARY KEY AUTOINCREMENT,
-                riderid INTEGER NOT NULL,
-                from_location TEXT NOT NULL,
-                to_location TEXT NOT NULL,
-                date TEXT NOT NULL,
-                time TEXT NOT NULL
-            );
-            ''')
+
+            # Check if the rides table already exists
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='rides';")
+            table_exists = cursor.fetchone()
+
+            # If the rides table doesn't exist, create it
+            if not table_exists:
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS rides (
+                    rideid INTEGER PRIMARY KEY AUTOINCREMENT,
+                    riderid INTEGER NOT NULL,
+                    ridername TEXT NOT NULL,
+                    from_location TEXT NOT NULL,
+                    to_location TEXT NOT NULL,
+                    date TEXT NOT NULL,
+                    time TEXT NOT NULL,
+                    available_seats INTEGER NOT NULL,
+                    FOREIGN KEY (riderid) REFERENCES users(userid)
+                );
+                ''')
 
     #add ride method, adds riderid, from_location, to_location, date, time to model
-    def add_ride(self,riderid, from_location, to_location, date, time):
-        with sqlite3.connect(self.db_name) as conn:
+    def add_ride(self,riderid,ridername, from_location, to_location, date, time, available_seats):
+        with sqlite3.connect(self.rides_db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute('''INSERT INTO rides (riderid,from_location, to_location, date, time) VALUES (?, ?, ?, ?)''', (riderid,from_location, to_location, date, time))
+            cursor.execute('''INSERT INTO rides (riderid,ridername,from_location, to_location, date, time,available_seats) VALUES (?, ?,?,?, ?,?, ?)''', (riderid,ridername,from_location, to_location, date, time, available_seats))
             ride_id = cursor.lastrowid
-        return ride_id
+
+            #get lastrow ride object with rowid
+            ride = cursor.execute('''SELECT * FROM rides WHERE rowid = ?''', (ride_id,)).fetchone()
+        return ride
+    
+
+    #get rides by riderid
+    def get_rides_by_riderid(self, riderid):
+        with sqlite3.connect(self.rides_db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''SELECT * FROM rides WHERE riderid = ?''', (riderid,))
+            rides = cursor.fetchall()
+        return rides
 
     def get_all_rides(self):
-        with sqlite3.connect(self.db_name) as conn:
+        with sqlite3.connect(self.rides_db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
                 SELECT * FROM rides
@@ -97,19 +117,22 @@ class Model:
                 return True
         return False
 
-    def insertUser(self, first_name, last_name, username, password, phone_number, dob):
+    def insertUser(self, first_name, last_name,email, username, password, phone_number, dob):
         with sqlite3.connect(self.users_db_path) as conn:
             cursor = conn.cursor()
 
             try:
                 cursor.execute('''
-                    INSERT INTO users (first_name, last_name, username, password, phone_number, dob)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                ''', (first_name, last_name, username, password, phone_number, dob))
+                    INSERT INTO users (first_name, last_name,email, username, password, phone_number, dob)
+                    VALUES (?, ?, ?,?, ?, ?, ?)
+                ''', (first_name, last_name,email, username, password, phone_number, dob))
                 
                 conn.commit()
                 return True  # Insertion successful
-            except sqlite3.IntegrityError:
+            except sqlite3.IntegrityError as exception:
+                #print exception
+                print("Error: {}".format(exception))
+
                 # Handle duplicate username or phone_number error
                 return False  # Insertion failed due to a duplicate
 
@@ -124,15 +147,6 @@ class Model:
             return user_data
         
         
-    def add_ride(self,riderid, from_location, to_location, date, time):
-        with sqlite3.connect(self.rides_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                INSERT INTO rides (riderid,from_location, to_location, date, time)
-                VALUES (?,?, ?, ?, ?)
-            ''', (riderid,from_location, to_location, date, time))
-            ride_id = cursor.lastrowid
-        return ride_id
     
     def get_user_by_username(self, db_path, username):
         with sqlite3.connect(db_path) as conn:
@@ -143,5 +157,17 @@ class Model:
             ''', (username,))
             user_data = cursor.fetchone()
             return user_data
+        
+    #update password
+    def update_password(self, username, password):
+        with sqlite3.connect(self.users_db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE users
+                SET password = ?
+                WHERE username = ?
+            ''', (password, username))
+            conn.commit()
+            return True  # Update successful
 
     # Add more methods for other database operations as needed.
