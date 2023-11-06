@@ -1,173 +1,240 @@
-import sqlite3
-import os
-
-DATABASE_DIR = os.path.join(os.getcwd(), "Database")
-USERS_DB =os.path.join(DATABASE_DIR,"users.db")
-RIDES_DB =os.path.join(DATABASE_DIR,"rides.db")
+import mysql.connector as mysql
 
 class Model:
-    def __init__(self,users_db_path =USERS_DB,rides_db=RIDES_DB):
-        self.users_db_path = users_db_path
-        self.rides_db_path = rides_db
-        self.init_users_db()
-        self.init_rides_db()
+    def __init__(self):
+        
+        self.letsride_database = {
+            'user': 'root',
+            'password': 'root',
+            'host': 'localhost',
+            'port': 3306,
+            'database': 'letsride'
+        }
+
+        self.init_db()
 
 
-    def init_users_db(self):
-        with sqlite3.connect(self.users_db_path) as conn:
-            cursor = conn.cursor()
 
-            # Check if the users table already exists
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users';")
-            table_exists = cursor.fetchone()
+    def init_db(self):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
 
-            # If the users table doesn't exist, create it
-            if not table_exists:
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS users (
-                    userid INTEGER PRIMARY KEY AUTOINCREMENT,
-                    first_name TEXT NOT NULL,
-                    last_name TEXT NOT NULL,
-                    email TEXT NOT NULL,
-                    username TEXT NOT NULL UNIQUE,
-                    password TEXT NOT NULL,
-                    phone_number TEXT NOT NULL UNIQUE,
-                    dob TEXT NOT NULL
-                );
-                ''')
+        # Create the 'users' table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                userid INT AUTO_INCREMENT PRIMARY KEY,
+                first_name VARCHAR(255) NOT NULL,
+                last_name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                username VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                phone_number VARCHAR(255) NOT NULL UNIQUE,
+                dob VARCHAR(255) NOT NULL
+            );
+        ''')
 
-    def init_rides_db(self):
-        with sqlite3.connect(self.rides_db_path) as conn:
-            cursor = conn.cursor()
+        # Create the 'rides' table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS rides (
+                rideid INT AUTO_INCREMENT PRIMARY KEY,
+                driverid INT NOT NULL,
+                drivername VARCHAR(255) NOT NULL,
+                from_location VARCHAR(255) NOT NULL,
+                to_location VARCHAR(255) NOT NULL,
+                date VARCHAR(255) NOT NULL,
+                time VARCHAR(255) NOT NULL,
+                available_seats INT NOT NULL,
+                FOREIGN KEY (driverid) REFERENCES users(userid)
+            );
+        ''')
 
-            # Check if the rides table already exists
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='rides';")
-            table_exists = cursor.fetchone()
+        #create a table for confirmedrides
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS confirmedrides (
+                confirmedrideid INT AUTO_INCREMENT PRIMARY KEY,
+                rideid INT NOT NULL,
+                userid INT NOT NULL,
+                no_of_seats INT NOT NULL,
+                FOREIGN KEY (rideid) REFERENCES rides(rideid),
+                FOREIGN KEY (userid) REFERENCES users(userid)
+            );
+        ''')
 
-            # If the rides table doesn't exist, create it
-            if not table_exists:
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS rides (
-                    rideid INTEGER PRIMARY KEY AUTOINCREMENT,
-                    riderid INTEGER NOT NULL,
-                    ridername TEXT NOT NULL,
-                    from_location TEXT NOT NULL,
-                    to_location TEXT NOT NULL,
-                    date TEXT NOT NULL,
-                    time TEXT NOT NULL,
-                    available_seats INTEGER NOT NULL,
-                    FOREIGN KEY (riderid) REFERENCES users(userid)
-                );
-                ''')
+        conn.close()
 
-    #add ride method, adds riderid, from_location, to_location, date, time to model
-    def add_ride(self,riderid,ridername, from_location, to_location, date, time, available_seats):
-        with sqlite3.connect(self.rides_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''INSERT INTO rides (riderid,ridername,from_location, to_location, date, time,available_seats) VALUES (?, ?,?,?, ?,?, ?)''', (riderid,ridername,from_location, to_location, date, time, available_seats))
-            ride_id = cursor.lastrowid
+    #check_if_already_booked
+    def check_if_already_booked(self,rideid,userid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
 
-            #get lastrow ride object with rowid
-            ride = cursor.execute('''SELECT * FROM rides WHERE rowid = ?''', (ride_id,)).fetchone()
+        cursor.execute('''SELECT * FROM confirmedrides WHERE rideid = %s AND userid = %s''',(rideid,userid))
+        ride = cursor.fetchone()
+        conn.close()
         return ride
+
+
+    #update_available_seats
+    def update_available_seats(self,rideid,available_seats):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''UPDATE rides SET available_seats = %s WHERE rideid = %s''',(available_seats,rideid))
+        conn.commit()
+
+        cursor.execute("SELECT * FROM rides WHERE rideid = %s",(rideid,))
+        ride = cursor.fetchone()
+        conn.close()
+        return ride
+
+
+    #get_all_confirmed_rides_by_user
+    def get_all_confirmed_rides_by_user(self,userid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM confirmedrides WHERE userid = %s''',(userid,))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
+    
+    #.get_ride_by_rideid
+    def get_ride_by_rideid(self,rideid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM rides WHERE rideid = %s''',(rideid,))
+        ride = cursor.fetchone()
+        conn.close()
+        return ride
+
+
+    #confirm ride
+    def confirm_ride(self,rideid,userid,no_of_seats):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''INSERT INTO confirmedrides (rideid,userid,no_of_seats) VALUES (%s,%s,%s)''',(rideid,userid,no_of_seats))
+        conn.commit()
+
+        cursor.execute("SELECT * FROM confirmedrides WHERE confirmedrideid = LAST_INSERT_ID();")
+        ride = cursor.fetchone()
+        conn.close()
+        return ride
+
+
+    #get_rideid_by_ridedetails
+    def get_rideid_by_ridedetails(self,drivername,from_location,to_location,date,time,available_seats):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT rideid FROM rides WHERE drivername = %s AND from_location = %s AND to_location = %s AND date = %s AND time = %s AND available_seats=%s''', (drivername,from_location,to_location,date,time,available_seats))
+        rideid = cursor.fetchone()
+        conn.close()
+        return rideid
+
+    def add_ride(self, driverid, drivername, from_location, to_location, date, time, available_seats):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            INSERT INTO rides (driverid, drivername, from_location, to_location, date, time, available_seats)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ''', (driverid, drivername, from_location, to_location, date, time, available_seats))
+        conn.commit()
+
+        cursor.execute("SELECT * FROM rides WHERE rideid = LAST_INSERT_ID();")
+        ride = cursor.fetchone()
+        conn.close()
+        return ride
+
+    def get_rides_by_driverid(self, driverid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT * FROM rides
+            WHERE driverid = %s
+        ''', (driverid,))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
     
 
-    #get rides by riderid
-    def get_rides_by_riderid(self, riderid):
-        with sqlite3.connect(self.rides_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''SELECT * FROM rides WHERE riderid = ?''', (riderid,))
-            rides = cursor.fetchall()
+    def get_rides_by_user(self, userid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT * FROM confirmedrides
+            WHERE userid = %s
+        ''', (userid,))
+        rides = cursor.fetchall()
+        conn.close()
         return rides
 
     def get_all_rides(self):
-        with sqlite3.connect(self.rides_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                SELECT * FROM rides
-            ''')
-            rides = cursor.fetchall()
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT * FROM rides')
+        rides = cursor.fetchall()
+        conn.close()
         return rides
 
     def get_user_by_username(self, username):
-        with sqlite3.connect(self.users_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                SELECT * FROM users
-                WHERE username = ?
-            ''', (username,))
-            user_data = cursor.fetchone()
-            return user_data
-        
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT * FROM users
+            WHERE username = %s
+        ''', (username,))
+        user_data = cursor.fetchone()
+        conn.close()
+        return user_data
+
+    # Add more methods for other database operations as needed
 
     def get_User_by_phone_number(self, phone_number):
-        with sqlite3.connect(self.users_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                SELECT * FROM users
-                WHERE phone_number = ?
-            ''', (phone_number,))
-            user_data = cursor.fetchone()
-            return user_data
-        
-    def login(self, username, password):
-        user_data = self.get_user_by_username(username)
-        if user_data:
-            if user_data[4] == password:
-                return True
-        return False
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
 
-    def insertUser(self, first_name, last_name,email, username, password, phone_number, dob):
-        with sqlite3.connect(self.users_db_path) as conn:
-            cursor = conn.cursor()
+        cursor.execute('''
+            SELECT * FROM users
+            WHERE phone_number = %s
+        ''', (phone_number,))
+        user_data = cursor.fetchone()
+        conn.close()
+        return user_data
 
-            try:
-                cursor.execute('''
-                    INSERT INTO users (first_name, last_name,email, username, password, phone_number, dob)
-                    VALUES (?, ?, ?,?, ?, ?, ?)
-                ''', (first_name, last_name,email, username, password, phone_number, dob))
-                
-                conn.commit()
-                return True  # Insertion successful
-            except sqlite3.IntegrityError as exception:
-                #print exception
-                print("Error: {}".format(exception))
 
-                # Handle duplicate username or phone_number error
-                return False  # Insertion failed due to a duplicate
+    def insertUser(self, first_name, last_name, email, username, password, phone_number, dob):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
 
-    def get_loginUser_by_phone_number(self, phone_number):
-        with sqlite3.connect(self.users_db_path) as conn:
-            cursor = conn.cursor()
+        try:
             cursor.execute('''
-                SELECT * FROM users
-                WHERE phone_number = ?
-            ''', (phone_number,))
-            user_data = cursor.fetchone()
-            return user_data
-        
-        
-    
-    def get_user_by_username(self, db_path, username):
-        with sqlite3.connect(db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                SELECT * FROM users
-                WHERE username = ?
-            ''', (username,))
-            user_data = cursor.fetchone()
-            return user_data
-        
-    #update password
-    def update_password(self, username, password):
-        with sqlite3.connect(self.users_db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                UPDATE users
-                SET password = ?
-                WHERE username = ?
-            ''', (password, username))
+                INSERT INTO users (first_name, last_name, email, username, password, phone_number, dob)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ''', (first_name, last_name, email, username, password, phone_number, dob))
             conn.commit()
-            return True  # Update successful
+            conn.close()
+            return True  # Insertion successful
+        except mysql.IntegrityError:
+            # Handle duplicate username or phone_number error
+            conn.close()
+            return False  # Insertion failed due to a duplicate
 
-    # Add more methods for other database operations as needed.
+
+    def update_password(self, username, password):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            UPDATE users
+            SET password = %s
+            WHERE username = %s
+        ''', (password, username))
+        conn.commit()
+        conn.close()
+        return True  # Update successful

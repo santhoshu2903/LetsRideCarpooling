@@ -14,19 +14,46 @@ class Controller:
         # self.view= View.View()
 
 
+    #check_if_already_booked
+    def check_if_already_booked(self,rideid,userid):
+        return self.model.check_if_already_booked(rideid,userid)
+    #update_available_seats
+    def update_available_seats(self,rideid,available_seats):
+        return self.model.update_available_seats(rideid,available_seats)
+
+
+    #.get_ride_by_rideid
+    def get_ride_by_rideid(self,rideid):
+        return self.model.get_ride_by_rideid(rideid)
+
+    #get_all_confirmed_rides_by_user
+    def get_all_confirmed_rides_by_user(self,userid):
+        return self.model.get_all_confirmed_rides_by_user(userid)
+
+
+    #confirm ride
+    def confirm_ride(self,rideid,userid,no_of_seats):
+        return self.model.confirm_ride( rideid,userid,no_of_seats)
+    
+    #get_rideid_by_ridedetails
+
+    def get_rideid_by_ridedetails(self,driverid,from_location,to_location,date,time,available_seats):
+        return self.model.get_rideid_by_ridedetails(driverid,from_location,to_location,date,time,available_seats)
+
+
     def registerUser(self,first_name, last_name,gmail, username, complete_phone_number, dob):
         return self.model.insertUser(first_name, last_name,gmail, username,self.generatePassword(), complete_phone_number, dob)
     
 
-    def add_ride(self, riderid,ridername,from_location, to_location, date, time,available_seats):
-        return self.model.add_ride(riderid,ridername,from_location, to_location, date, time,available_seats)
+    def add_ride(self, driverid,drivername,from_location, to_location, date, time,available_seats):
+        return self.model.add_ride(driverid,drivername,from_location, to_location, date, time,available_seats)
     
     def get_current_user_object(self,phone_number):
         return self.model.get_User_by_phone_number(phone_number)    
     
     #get rides by riderid
-    def get_rides_by_riderid(self, riderid):
-        return self.model.get_rides_by_riderid(riderid)
+    def get_rides_by_driverid(self, driverid):
+        return self.model.get_rides_by_driverid(driverid)
     
 
     #get user object by phone number
@@ -34,8 +61,8 @@ class Controller:
         return self.model.get_User_by_phone_number(phone_number)
 
     #get rides by that user
-    def get_rides_by_user(self, riderid):
-        return self.model.get_rides_by_user(riderid)
+    def get_rides_by_user(self, driverid):
+        return self.model.get_rides_by_user(driverid)
     
 
     def sendOtp(self,phoneNumber):
@@ -45,7 +72,7 @@ class Controller:
 
         # account 1
         accountSID = "ACd607e2f86a57f692c81867be2f0b351f"
-        authToken = "28000cefd2c2ff8f4c7ebb8b73d500ea"
+        authToken = "3499617b5bc92aed2657c47991aa83ed"
         twillioPhoneNumber = "+18449584452"
 
 
