@@ -3,11 +3,10 @@ from tkinter import messagebox
 # import ttkbootstrap as tb
 import customtkinter as ctk
 import Controller
-import tkinter.ttk as ttk
-from tkinter import font
-from tkcalendar import Calendar, DateEntry
 import CTkTable  as ctkTable
 from CTkTableRowSelector import *
+import os
+from fpdf import FPDF
 
 class View(ctk.CTk):
     def __init__(self):
@@ -89,6 +88,60 @@ class View(ctk.CTk):
         self.feedback_button.configure(fg_color=("dodger blue") if frame_name == "feedback" else "transparent")
 
         self.frame[frame_name].grid(row=0, column=1, sticky="nsew")
+
+    #admin page
+    def admin_page(self):
+        self.clear_content()
+        self.geometry("600x400")
+
+        # #set grid layout
+        # self.grid_rowconfigure(0, weight=1)
+        # self.grid_columnconfigure(1, weight=1)
+
+        #welcome admin message
+        self.welcome_admin_label = ctk.CTkLabel(self, text="Welcome Admin", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.welcome_admin_label.grid(row=0, column=0,columnspan=3, sticky="nsew", padx=10, pady=10)
+
+        #label and count of all rides
+        self.all_rides_label = ctk.CTkLabel(self, text="All Rides : ", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.all_rides_label.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+
+        #get count of all rides
+        self.all_rides_count = self.controller.get_all_rides_count()
+
+        #label to display count of all rides
+        self.all_rides_count_label = ctk.CTkLabel(self, text=str(self.all_rides_count[0]), fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.all_rides_count_label.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
+
+        #count of active passengers
+        self.active_passengers_label = ctk.CTkLabel(self, text="Active Passengers : ", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.active_passengers_label.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
+
+        #get count of active passengers
+        self.active_passengers_count = self.controller.get_active_passengers_count()
+
+        #label to display count of active passengers
+        self.active_passengers_count_label = ctk.CTkLabel(self, text=str(self.active_passengers_count[0]), fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.active_passengers_count_label.grid(row=2, column=1, sticky="nsew", padx=10, pady=10)
+
+        #get all rides reports button
+        self.get_all_rides_report_button = ctk.CTkButton(self, text="Get All Rides Report",command=self.get_all_rides_reports)
+        self.get_all_rides_report_button.grid(row=3, column=0, sticky="nsew", padx=10, pady=10)
+
+        #all users reports button
+        self.get_all_users_report_button = ctk.CTkButton(self, text="Get All Users Report",command=self.get_all_users_reports)
+        self.get_all_users_report_button.grid(row=3, column=1, sticky="nsew", padx=10, pady=10)
+
+        #logout button
+        self.logout_button = ctk.CTkButton(self, text="Logout",command=self.show_welcome)
+        self.logout_button.grid(row=3, column=2, sticky="nsew", padx=10, pady=10)
+
+
+
+
+
+    
+
 
     def home_page(self):
         self.clear_content()
@@ -183,9 +236,24 @@ class View(ctk.CTk):
         self.frame["give_ride"] = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         self.frame["give_ride"].columnconfigure(0, weight=1)
 
+
+        #current ride name and count of active rides
+        self.current_user_name = self.current_user_object[1]+" "+self.current_user_object[2]
+        self.current_user_id = self.current_user_object[0]
+
+        #get count of rides by current user
+        self.current_user_rides_count = self.controller.get_rides_count_by_driverid(self.current_user_id)
+
+        #label to display name and count of rides
+        self.current_user_name_and_rides_count_label = ctk.CTkLabel(self.frame["give_ride"], text="Welcome "+self.current_user_name+" ! You have "+str(self.current_user_rides_count[0])+" active rides", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.current_user_name_and_rides_count_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
+
+
         #create create ride button top right corner
         self.create_ride_button = ctk.CTkButton(self.frame["give_ride"], text="+ New Ride",command=lambda :  self.show_home_page_frame("new_ride"))
         self.create_ride_button.grid(row=0, column=5, sticky="nw", padx=30, pady=30)
+
+
 
         #give_ride headers
         give_ride_headers = [["Ride ID",  "From Location", "To Location", "Date", "Start Time","Available Seats"]]
@@ -562,6 +630,111 @@ class View(ctk.CTk):
         self.back_button.pack(pady=5)
 
 
+    #get_all_rides_reports
+    #get all rides from database and create a pdf report
+    def get_all_rides_reports(self):
+
+        #get all rides data
+        all_rides_data = self.controller.get_all_rides()
+
+        #create pdf
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 10, txt="All Rides Report", ln=1, align="C")
+        pdf.cell(200, 10, txt=" ", ln=1, align="C")
+        pdf.cell(200, 10, txt=" ", ln=1, align="C")
+        pdf.cell(200, 10, txt=" ", ln=1, align="C")
+        pdf.cell(200, 10, txt=" ", ln=1, align="C")
+        pdf.cell(200, 10, txt=" ", ln=1, align="C")
+        pdf.cell(200, 10, txt=" ", ln=1, align="C")
+
+        #create table
+        pdf.cell(200, 10, txt="Ride ID", ln=1, align="C")
+        pdf.cell(200, 10, txt="Driver ID", ln=1, align="C")
+        pdf.cell(200, 10, txt="Driver Name", ln=1, align="C")
+        pdf.cell(200, 10, txt="From Location", ln=1, align="C")
+        pdf.cell(200, 10, txt="To Location", ln=1, align="C")
+        pdf.cell(200, 10, txt="Date", ln=1, align="C")
+        pdf.cell(200, 10, txt="Time", ln=1, align="C")
+        pdf.cell(200, 10, txt="Available Seats", ln=1, align="C")
+
+        #insert data into table
+        for ride in all_rides_data:
+            pdf.cell(200, 10, txt=str(ride[0]), ln=1, align="C")
+            pdf.cell(200, 10, txt=str(ride[1]), ln=1, align="C")
+            pdf.cell(200, 10, txt=str(ride[2]), ln=1, align="C")
+            pdf.cell(200, 10, txt=str(ride[3]), ln=1, align="C")
+            pdf.cell(200, 10, txt=str(ride[4]), ln=1, align="C")
+            pdf.cell(200, 10, txt=str(ride[5]), ln=1, align="C")
+            pdf.cell(200, 10, txt=str(ride[6]), ln=1, align="C")
+            pdf.cell(200, 10, txt=str(ride[7]), ln=1, align="C")
+
+        #save pdf
+        pdf.output("all_rides_report.pdf")
+        
+        #show success message
+        messagebox.showinfo("Success", "All Rides Report Generated Successfully")
+        #show location of pdf
+        messagebox.showinfo("Success", "All Rides Report Generated Successfully at "+os.getcwd())
+
+
+    #get_all_users_report
+    #get all users from database and create a pdf report
+    def get_all_users_reports(self):
+    
+            #get all users data
+            all_users_data = self.controller.get_all_users()
+    
+            #create pdf
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 10, txt="All Users Report", ln=1, align="C")
+            pdf.cell(200, 10, txt=" ", ln=1, align="C")
+            pdf.cell(200, 10, txt=" ", ln=1, align="C")
+            pdf.cell(200, 10, txt=" ", ln=1, align="C")
+    
+            #create table
+            pdf.cell(200, 10, txt="User ID", ln=1, align="C")
+            pdf.cell(200, 10, txt="First Name", ln=1, align="C")
+            pdf.cell(200, 10, txt="Last Name", ln=1, align="C")
+            pdf.cell(200, 10, txt="Gmail", ln=1, align="C")
+            pdf.cell(200, 10, txt="Username", ln=1, align="C")
+            pdf.cell(200, 10, txt="Phone Number", ln=1, align="C")
+            pdf.cell(200, 10, txt="User Type", ln=1, align="C")
+            pdf.cell(200, 10, txt="Date of Birth", ln=1, align="C")
+    
+            #insert data into table
+            for user in all_users_data:
+                pdf.cell(200, 10, txt=str(user[0]), ln=1, align="C")
+                pdf.cell(200, 10, txt=str(user[1]), ln=1, align="C")
+                pdf.cell(200, 10, txt=str(user[2]), ln=1, align="C")
+                pdf.cell(200, 10, txt=str(user[3]), ln=1, align="C")
+                pdf.cell(200, 10, txt=str(user[4]), ln=1, align="C")
+
+                #get phone extension
+                phone_extension = user[5][0:2]
+                pdf.cell(200, 10, txt=str(phone_extension), ln=1, align="C")
+
+                #get phone number
+                phone_number = user[5][2:]
+                pdf.cell(200, 10, txt=str(phone_number), ln=1, align="C")
+
+                pdf.cell(200, 10, txt=str(user[6]), ln=1, align="C")
+                pdf.cell(200, 10, txt=str(user[7]), ln=1, align="C")
+
+            #save pdf
+            pdf.output("all_users_report.pdf")
+
+            #show success message
+            messagebox.showinfo("Success", "All Users Report Generated Successfully")
+
+            #show location of pdf
+            messagebox.showinfo("Success", "All Users Report Generated Successfully at "+os.getcwd())
+
+
+
 
 
 
@@ -645,13 +818,19 @@ class View(ctk.CTk):
         self.show_welcome()
 
     def sendOtpRequest(self):
+
+        if self.phone_number_entry.get() == "admin":
+            self.admin_page()
+            #welcome admin message
+            messagebox.showinfo("Success", "Welcome Admin")
+            return
        
         self.current_user_phone_number =  self.phone_extension_combobox.get()+self.phone_number_entry.get()
         #check if number exists in database
         self.current_user_object = self.controller.get_user_by_phone_number(self.current_user_phone_number)
         if self.current_user_object:
             #send otp to the user
-            if self.current_user_phone_number == "+19803224017":
+            if self.current_user_phone_number == "+1989449043":
                 self.controller.sendOtp(self.current_user_phone_number)
                 messagebox.showinfo("Success", "OTP sent successfully.")
                 return

@@ -147,6 +147,16 @@ class Model:
         conn.close()
         return ride
 
+    #get_all_users
+    def get_all_users(self):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT * FROM users')
+        users = cursor.fetchall()
+        conn.close()
+        return users
+
     def get_rides_by_driverid(self, driverid):
         conn = mysql.connect(**self.letsride_database)
         cursor = conn.cursor()
@@ -171,6 +181,49 @@ class Model:
         rides = cursor.fetchall()
         conn.close()
         return rides
+    
+    #get_all_rides_count
+    def get_all_rides_count(self):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT COUNT(*) FROM rides''')
+        rides_count = cursor.fetchone()
+        conn.close()
+        return rides_count
+    
+    #get_active_passengers_count from confirmedrides table seats booked column  
+    def get_active_passengers_count(self):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT SUM(no_of_seats) FROM confirmedrides''')
+        passengers_count = cursor.fetchone()
+        conn.close()
+        return passengers_count
+
+    
+    #get_active_rides_count  from rides table with date greater than yesterday
+    def get_active_rides_count(self):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT COUNT(*) FROM rides WHERE date > CURDATE()''')
+        rides_count = cursor.fetchone()
+        conn.close()
+        return rides_count
+
+    
+
+    #get_rides_count_by_driverid
+    def get_rides_count_by_driverid(self,driverid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT COUNT(*) FROM rides WHERE driverid = %s''',(driverid,))
+        rides_count = cursor.fetchone()
+        conn.close()
+        return rides_count
 
     def get_all_rides(self):
         conn = mysql.connect(**self.letsride_database)

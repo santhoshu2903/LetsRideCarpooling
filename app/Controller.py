@@ -20,6 +20,22 @@ class Controller:
     #update_available_seats
     def update_available_seats(self,rideid,available_seats):
         return self.model.update_available_seats(rideid,available_seats)
+    
+    #get_rides_count_by_driverid
+    def get_rides_count_by_driverid(self,driverid):
+        return self.model.get_rides_count_by_driverid(driverid)
+    
+    #get_all_rides_count
+    def get_all_rides_count(self):
+        return self.model.get_all_rides_count()
+    
+    #get_active_riders_count
+    def get_active_riders_count(self):
+        return self.model.get_active_riders_count()
+    
+    #get_active_passengers_count
+    def get_active_passengers_count(self):
+        return self.model.get_active_passengers_count()
 
 
     #.get_ride_by_rideid
@@ -49,7 +65,13 @@ class Controller:
         return self.model.add_ride(driverid,drivername,from_location, to_location, date, time,available_seats)
     
     def get_current_user_object(self,phone_number):
-        return self.model.get_User_by_phone_number(phone_number)    
+        return self.model.get_User_by_phone_number(phone_number)  
+
+
+    #get_all_users
+    def get_all_users(self):
+        return self.model.get_all_users()
+          
     
     #get rides by riderid
     def get_rides_by_driverid(self, driverid):
@@ -72,7 +94,7 @@ class Controller:
 
         # account 1
         accountSID = "ACd607e2f86a57f692c81867be2f0b351f"
-        authToken = "3499617b5bc92aed2657c47991aa83ed"
+        authToken = "67aade8043b726228d6eea789bb0eb15"
         twillioPhoneNumber = "+18449584452"
 
 
