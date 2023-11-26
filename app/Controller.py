@@ -71,6 +71,15 @@ class Controller:
     #get_all_users
     def get_all_users(self):
         return self.model.get_all_users()
+    
+    #get_User_by_userid
+    def get_User_by_userid(self,userid):
+        return self.model.get_User_by_userid(userid)
+    
+    #get_all_confirmed_rides_by_rideid
+    def get_all_confirmed_rides_by_rideid(self,rideid):
+        return self.model.get_all_confirmed_rides_by_rideid(rideid)
+    
           
     
     #get rides by riderid
@@ -85,6 +94,10 @@ class Controller:
     #get rides by that user
     def get_rides_by_user(self, driverid):
         return self.model.get_rides_by_user(driverid)
+    
+    #get_all_confirmed_rides
+    def get_all_confirmed_rides(self):
+        return self.model.get_all_confirmed_rides()
     
 
     def sendOtp(self,phoneNumber):

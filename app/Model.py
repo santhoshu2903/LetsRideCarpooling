@@ -62,6 +62,35 @@ class Model:
 
         conn.close()
 
+    #get_all_confirmed_rides_by_rideid
+    def get_all_confirmed_rides_by_rideid(self,rideid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM confirmedrides WHERE rideid = %s''',(rideid,))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
+
+    #get_User_by_userid
+    def get_User_by_userid(self,userid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM users WHERE userid = %s''',(userid,))
+        user = cursor.fetchone()
+        conn.close()
+        return user
+    #get_all_confirmed_rides
+    def get_all_confirmed_rides(self):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM confirmedrides''')
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
+
     #check_if_already_booked
     def check_if_already_booked(self,rideid,userid):
         conn = mysql.connect(**self.letsride_database)

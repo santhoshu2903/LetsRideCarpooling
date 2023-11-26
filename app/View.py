@@ -92,49 +92,131 @@ class View(ctk.CTk):
     #admin page
     def admin_page(self):
         self.clear_content()
-        self.geometry("600x400")
+        self.geometry("1050x700")
 
         # #set grid layout
         # self.grid_rowconfigure(0, weight=1)
-        # self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(1, weight=1)
 
         #welcome admin message
         self.welcome_admin_label = ctk.CTkLabel(self, text="Welcome Admin", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.welcome_admin_label.grid(row=0, column=0,columnspan=3, sticky="nsew", padx=10, pady=10)
 
-        #label and count of all rides
-        self.all_rides_label = ctk.CTkLabel(self, text="All Rides : ", fg_color="transparent", font=("Helvetica", 20, "bold"))
-        self.all_rides_label.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        # #label and count of all rides
+        # self.all_rides_label = ctk.CTkLabel(self, text="All Rides : ", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        # self.all_rides_label.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
 
-        #get count of all rides
-        self.all_rides_count = self.controller.get_all_rides_count()
+        # #get count of all rides
+        # self.all_rides_count = self.controller.get_all_rides_count()
 
-        #label to display count of all rides
-        self.all_rides_count_label = ctk.CTkLabel(self, text=str(self.all_rides_count[0]), fg_color="transparent", font=("Helvetica", 20, "bold"))
-        self.all_rides_count_label.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
+        # #label to display count of all rides
+        # self.all_rides_count_label = ctk.CTkLabel(self, text=str(self.all_rides_count[0]), fg_color="transparent", font=("Helvetica", 20, "bold"))
+        # self.all_rides_count_label.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
 
-        #count of active passengers
-        self.active_passengers_label = ctk.CTkLabel(self, text="Active Passengers : ", fg_color="transparent", font=("Helvetica", 20, "bold"))
-        self.active_passengers_label.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
+        # #count of active passengers
+        # self.active_passengers_label = ctk.CTkLabel(self, text="Active Passengers : ", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        # self.active_passengers_label.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
 
-        #get count of active passengers
-        self.active_passengers_count = self.controller.get_active_passengers_count()
+        # #get count of active passengers
+        # self.active_passengers_count = self.controller.get_active_passengers_count()
 
-        #label to display count of active passengers
-        self.active_passengers_count_label = ctk.CTkLabel(self, text=str(self.active_passengers_count[0]), fg_color="transparent", font=("Helvetica", 20, "bold"))
-        self.active_passengers_count_label.grid(row=2, column=1, sticky="nsew", padx=10, pady=10)
+        # #label to display count of active passengers
+        # self.active_passengers_count_label = ctk.CTkLabel(self, text=str(self.active_passengers_count[0]), fg_color="transparent", font=("Helvetica", 20, "bold"))
+        # self.active_passengers_count_label.grid(row=2, column=1, sticky="nsew", padx=10, pady=10)
 
-        #get all rides reports button
-        self.get_all_rides_report_button = ctk.CTkButton(self, text="Get All Rides Report",command=self.get_all_rides_reports)
-        self.get_all_rides_report_button.grid(row=3, column=0, sticky="nsew", padx=10, pady=10)
 
-        #all users reports button
-        self.get_all_users_report_button = ctk.CTkButton(self, text="Get All Users Report",command=self.get_all_users_reports)
-        self.get_all_users_report_button.grid(row=3, column=1, sticky="nsew", padx=10, pady=10)
+        #notebook
+        self.notebook = ctk.CTkTabview(self)
+        self.notebook.grid(row=3, column=0,columnspan=4, sticky="nsew")
 
+        #add tabs   
+        self.notebook.add("Rides Reports")
+        self.notebook.add("Confirmed Rides Reports")
+        self.notebook.add("Users Reports")
+
+        #rides table in rides reports tab
+        #rides headers
+        rides_headers = [["Ride ID", "Driver Name", "From Location", "To Location", "Date", "Start Time","Available Seats"]]
+        #table data
+        self.rides_table_data = rides_headers
+
+        #insert rideid, driver name, from location, to location, date, time and available seats in table_data
+        for ride in self.controller.get_all_rides():
+            self.rides_table_data.append([ride[0],ride[2],ride[3],ride[4],ride[5],ride[6],ride[7]])
+
+        #table frame
+        self.rides_table_frame = ctk.CTkFrame(self.notebook.tab("Rides Reports"), fg_color="transparent", corner_radius=0)
+        self.rides_table_frame.grid(row=0, column=0, columnspan=5, sticky="nsew", padx=10, pady=10)
+
+        #table
+        self.rides_table= ctkTable.CTkTable(self.rides_table_frame,values=self.rides_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
+        self.rides_table.edit_row(0,text_color="blue",hover_color="light blue")
+        self.rides_table.grid(sticky="nsew", padx=10, pady=10)
+
+        #confirmed rides table in confirmed rides reports tab
+        #confirmed rides headers
+        confirmed_rides_headers = [["Ride ID", "User Name", "From Location", "To Location", "Date", "Start Time","Seats Booked"]]
+        #table data
+        self.confirmed_rides_table_data = confirmed_rides_headers
+
+        #get all confirmed rides
+        #get rideid, userid, seats booked
+        #get user name from userid
+        #get ride details from rideid
+
+        #insert rideid, user name, from location, to location, date, time and seats booked in table_data
+        for ride in self.controller.get_all_confirmed_rides():
+            ride_details = self.controller.get_ride_by_rideid(ride[1])
+            user_details = self.controller.get_User_by_userid(ride[2])
+            self.confirmed_rides_table_data.append([ride[1],user_details[1]+" "+user_details[2],ride_details[3],ride_details[4],ride_details[5],ride_details[6],ride[3]])
+            
+
+        #table frame
+        self.confirmed_rides_table_frame = ctk.CTkFrame(self.notebook.tab("Confirmed Rides Reports"), fg_color="transparent", corner_radius=0)
+        self.confirmed_rides_table_frame.grid(row=0, column=0, columnspan=5, sticky="nsew", padx=10, pady=10)
+        
+        #table
+        self.confirmed_rides_table= ctkTable.CTkTable(self.confirmed_rides_table_frame,values=self.confirmed_rides_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
+        self.confirmed_rides_table.edit_row(0,text_color="blue",hover_color="light blue")
+
+        self.confirmed_rides_table.grid(sticky="nsew", padx=10, pady=10)
+
+        #users table in users reports tab
+        #users headers
+        users_headers = [["User ID", "First Name", "Last Name", "Phone Number", "Email"]]
+        #table data
+        self.users_table_data = users_headers
+
+        #insert userid, first name, last name, phone number and email in table_data
+        for user in self.controller.get_all_users():
+            self.users_table_data.append([user[0],user[1],user[2],user[3],user[4]])
+
+        #table frame
+        self.users_table_frame = ctk.CTkFrame(self.notebook.tab("Users Reports"), fg_color="transparent", corner_radius=0)
+        self.users_table_frame.grid(row=0, column=0, columnspan=5, sticky="nsew", padx=10, pady=10)
+
+        #table
+        self.users_table= ctkTable.CTkTable(self.users_table_frame,values=self.users_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
+        self.users_table.edit_row(0,text_color="blue",hover_color="light blue")
+        self.users_table.grid(sticky="nsew", padx=10, pady=10)
+
+        #print as pdf button in all tabs
+        self.print_as_pdf_button = ctk.CTkButton(self.notebook.tab("Rides Reports"), text="Print as PDF",command=self.get_all_rides_reports)
+        self.print_as_pdf_button.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+
+        self.print_as_pdf_button = ctk.CTkButton(self.notebook.tab("Confirmed Rides Reports"), text="Print as PDF",command=self.get_all_confirmed_rides_reports)
+        self.print_as_pdf_button.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+
+        self.print_as_pdf_button = ctk.CTkButton(self.notebook.tab("Users Reports"), text="Print as PDF",command=self.get_all_users_reports)
+        self.print_as_pdf_button.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+
+
+
+
+        #rides reports frame
         #logout button
         self.logout_button = ctk.CTkButton(self, text="Logout",command=self.show_welcome)
-        self.logout_button.grid(row=3, column=2, sticky="nsew", padx=10, pady=10)
+        self.logout_button.grid(row=6, column=0, sticky="nsew", padx=10, pady=10)
 
 
 
@@ -275,6 +357,14 @@ class View(ctk.CTk):
         # self.search_for_ride_table.columns[0].width = 100
         self.give_ride_table.grid(sticky="nsew", padx=10, pady=10)
 
+        #create ctkrowselector for give ride table
+
+        self.give_ride_table_selector = CTkTableRowSelector(self.give_ride_table)
+
+        #Passenger Details button
+        self.passenger_details_button = ctk.CTkButton(self.frame["give_ride"], text="Passenger Details",command=self.show_passenger_details)
+        self.passenger_details_button.grid(row=4, column=0, sticky="w", padx=10, pady=10)
+
         #create new ride frame as frame["new_ride"]
         self.frame["new_ride"] = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
         self.frame["new_ride"].columnconfigure(1, weight=1)
@@ -388,6 +478,44 @@ class View(ctk.CTk):
 
         #show dashboard frame as default frame
         self.show_home_page_frame("dashboard")
+
+    #show_passenger_details
+    def show_passenger_details(self):
+        #clear give ride frame
+        self.frame["give_ride"].grid_forget()
+
+        #now fill give ride frame with passenger details table of selected ride
+        #get rideid from selected row
+        self.selected_rideid = self.give_ride_table_selector.get()[0][0]
+
+        ride_details = self.controller.get_ride_by_rideid(self.selected_rideid)
+
+        confirmed_rides_data = self.controller.get_all_confirmed_rides_by_rideid(self.selected_rideid)
+
+        #create passenger details table headers
+        passenger_details_headers = [["Passenger Name", "Gmail","Phone Number","Seats Booked"]]
+
+        #create passenger details table data
+        passenger_details_table_data = passenger_details_headers
+
+        #insert passenger name, gmail, phone number and seats booked in table_data
+        for ride in confirmed_rides_data:
+            user_details = self.controller.get_User_by_userid(ride[2])
+            passenger_details_table_data.append([user_details[1]+" "+user_details[2],user_details[4],user_details[3],ride[3]])
+
+        #table frame
+        self.passenger_details_table_frame = ctk.CTkFrame(self.frame["give_ride"], fg_color="transparent", corner_radius=0)
+        self.passenger_details_table_frame.grid(row=3, column=0, columnspan=6, sticky="nsew", padx=10, pady=10)
+
+        #table
+        self.passenger_details_table= ctkTable.CTkTable(self.passenger_details_table_frame,values=passenger_details_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
+        self.passenger_details_table.edit_row(0,text_color="blue",hover_color="light blue")
+
+        self.passenger_details_table.grid(sticky="nsew", padx=10, pady=10)
+
+        #create back button to dashboard frame
+        self.back_button = ctk.CTkButton(self.frame["give_ride"], text="Back",command=self.home_page)
+        self.back_button.grid(row=4, column=1, sticky="w", padx=10, pady=10)
 
 
     def search_for_ride_page(self):
@@ -630,6 +758,69 @@ class View(ctk.CTk):
         self.back_button.pack(pady=5)
 
 
+    #get_all_confirmed_rides_report
+    #get all confirmed rides from database and create a pdf report
+    def get_all_confirmed_rides_reports(self):
+            
+            #get all confirmed rides data
+            all_confirmed_rides_data = self.controller.get_all_confirmed_rides()
+    
+            #create pdf
+            pdf = FPDF(orientation='L')
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+    
+            #add title to page
+            pdf.cell(200, 10, txt="All Confirmed Rides Report", ln=1, align="C")
+    
+            #add header to table
+            pdf.cell(30, 10, txt="Ride ID", border=1)
+            pdf.cell(50, 10, txt="Driver Name", border=1)
+            pdf.cell(50, 10, txt="Passenger Name", border=1)
+            pdf.cell(50, 10, txt="From Location", border=1)
+            pdf.cell(50, 10, txt="To Location", border=1)
+            pdf.cell(30, 10, txt="Date", border=1)
+            pdf.cell(30, 10, txt="Time", border=1)
+            pdf.cell(30, 10, txt="Seats Booked", border=1)
+            pdf.ln()
+    
+            #add ride data to table
+            for ride in all_confirmed_rides_data:
+                ride_details = self.controller.get_ride_by_rideid(ride[1])
+                ride_id = ride_details[0]
+                driver_name = ride_details[2]
+                user_details = self.controller.get_user_by_userid(ride[2])
+                passenger_name = user_details[1] + " " + user_details[2]
+                from_location = ride_details[3]
+                to_location = ride_details[4]
+                date = ride_details[5]
+                time = ride_details[6]
+                seats_booked = ride[3]
+
+                pdf.cell(30, 10, txt=str(ride_id), border=1)
+                pdf.cell(50, 10, txt=driver_name, border=1)
+                pdf.cell(50, 10, txt=passenger_name, border=1)
+                pdf.cell(50, 10, txt=from_location, border=1)
+                pdf.cell(50, 10, txt=to_location, border=1)
+                pdf.cell(30, 10, txt=date, border=1)
+                pdf.cell(30, 10, txt=time, border=1)
+                pdf.cell(30, 10, txt=str(seats_booked), border=1)
+
+                pdf.ln()
+
+            #save pdf
+            pdf.output("all_confirmed_rides_report.pdf")
+
+            #show success message
+            messagebox.showinfo("Success", "All Confirmed Rides Report Generated Successfully")
+
+            #show location of pdf
+            messagebox.showinfo("Success", "All Confirmed Rides Report Generated Successfully at "+os.getcwd())
+
+
+
+
+
     #get_all_rides_reports
     #get all rides from database and create a pdf report
     def get_all_rides_reports(self):
@@ -638,37 +829,45 @@ class View(ctk.CTk):
         all_rides_data = self.controller.get_all_rides()
 
         #create pdf
-        pdf = FPDF()
+        # pdf = FPDF()
+        # pdf.add_page()
+        pdf = FPDF(orientation='L')
         pdf.add_page()
         pdf.set_font("Arial", size=12)
+
+        #add title to page
         pdf.cell(200, 10, txt="All Rides Report", ln=1, align="C")
-        pdf.cell(200, 10, txt=" ", ln=1, align="C")
-        pdf.cell(200, 10, txt=" ", ln=1, align="C")
-        pdf.cell(200, 10, txt=" ", ln=1, align="C")
-        pdf.cell(200, 10, txt=" ", ln=1, align="C")
-        pdf.cell(200, 10, txt=" ", ln=1, align="C")
-        pdf.cell(200, 10, txt=" ", ln=1, align="C")
 
-        #create table
-        pdf.cell(200, 10, txt="Ride ID", ln=1, align="C")
-        pdf.cell(200, 10, txt="Driver ID", ln=1, align="C")
-        pdf.cell(200, 10, txt="Driver Name", ln=1, align="C")
-        pdf.cell(200, 10, txt="From Location", ln=1, align="C")
-        pdf.cell(200, 10, txt="To Location", ln=1, align="C")
-        pdf.cell(200, 10, txt="Date", ln=1, align="C")
-        pdf.cell(200, 10, txt="Time", ln=1, align="C")
-        pdf.cell(200, 10, txt="Available Seats", ln=1, align="C")
+        #add header to table
+        pdf.cell(30, 10, txt="Ride ID", border=1)
+        pdf.cell(50, 10, txt="Driver Name", border=1)
+        pdf.cell(50, 10, txt="From Location", border=1)
+        pdf.cell(50, 10, txt="To Location", border=1)
+        pdf.cell(30, 10, txt="Date", border=1)
+        pdf.cell(30, 10, txt="Time", border=1)
+        pdf.cell(30, 10, txt="Available Seats", border=1)
+        pdf.ln()
 
-        #insert data into table
+        #add ride data to table
         for ride in all_rides_data:
-            pdf.cell(200, 10, txt=str(ride[0]), ln=1, align="C")
-            pdf.cell(200, 10, txt=str(ride[1]), ln=1, align="C")
-            pdf.cell(200, 10, txt=str(ride[2]), ln=1, align="C")
-            pdf.cell(200, 10, txt=str(ride[3]), ln=1, align="C")
-            pdf.cell(200, 10, txt=str(ride[4]), ln=1, align="C")
-            pdf.cell(200, 10, txt=str(ride[5]), ln=1, align="C")
-            pdf.cell(200, 10, txt=str(ride[6]), ln=1, align="C")
-            pdf.cell(200, 10, txt=str(ride[7]), ln=1, align="C")
+            ride_id = ride[0]
+            driver_name = ride[2]
+            from_location = ride[3]
+            to_location = ride[4]
+            date = ride[5]
+            time = ride[6]
+            available_seats = ride[7]
+
+            pdf.cell(30, 10, txt=str(ride_id), border=1)
+            pdf.cell(50, 10, txt=driver_name, border=1)
+            pdf.cell(50, 10, txt=from_location, border=1)
+            pdf.cell(50, 10, txt=to_location, border=1)
+            pdf.cell(30, 10, txt=date, border=1)
+            pdf.cell(30, 10, txt=time, border=1)
+            pdf.cell(30, 10, txt=str(available_seats), border=1)
+    
+            pdf.ln()
+
 
         #save pdf
         pdf.output("all_rides_report.pdf")
@@ -682,56 +881,47 @@ class View(ctk.CTk):
     #get_all_users_report
     #get all users from database and create a pdf report
     def get_all_users_reports(self):
+        # Get all users data
+        all_users_data = self.controller.get_all_users()
+
+        # Create PDF
+        pdf = FPDF(orientation='L')
+        pdf.add_page()
+
+        # Add a title to the page
+        pdf.set_font("Arial", size=20)
+        pdf.cell(200, 10, txt="Current Users Report", ln=1, align="C")
+
+        # Add a header to the table
+        pdf.set_font("Arial", size=12)
+        pdf.cell(30, 10, txt="User ID", border=1)
+        pdf.cell(50, 10, txt="Name", border=1)
+        pdf.cell(50, 10, txt="Email", border=1)
+        pdf.cell(30, 10, txt="Phone", border=1)
+        pdf.ln()
+
+        # Add user data to the table
+        for user in all_users_data:
+            user_id = user[0]
+            name = user[1] + " " + user[2]
+            email = user[3]
+            phone = user[6]
+
+            pdf.cell(30, 10, txt=str(user_id), border=1)
+            pdf.cell(50, 10, txt=name, border=1)
+            pdf.cell(50, 10, txt=email, border=1)
+            pdf.cell(30, 10, txt=phone, border=1)
     
-            #get all users data
-            all_users_data = self.controller.get_all_users()
-    
-            #create pdf
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_font("Arial", size=12)
-            pdf.cell(200, 10, txt="All Users Report", ln=1, align="C")
-            pdf.cell(200, 10, txt=" ", ln=1, align="C")
-            pdf.cell(200, 10, txt=" ", ln=1, align="C")
-            pdf.cell(200, 10, txt=" ", ln=1, align="C")
-    
-            #create table
-            pdf.cell(200, 10, txt="User ID", ln=1, align="C")
-            pdf.cell(200, 10, txt="First Name", ln=1, align="C")
-            pdf.cell(200, 10, txt="Last Name", ln=1, align="C")
-            pdf.cell(200, 10, txt="Gmail", ln=1, align="C")
-            pdf.cell(200, 10, txt="Username", ln=1, align="C")
-            pdf.cell(200, 10, txt="Phone Number", ln=1, align="C")
-            pdf.cell(200, 10, txt="User Type", ln=1, align="C")
-            pdf.cell(200, 10, txt="Date of Birth", ln=1, align="C")
-    
-            #insert data into table
-            for user in all_users_data:
-                pdf.cell(200, 10, txt=str(user[0]), ln=1, align="C")
-                pdf.cell(200, 10, txt=str(user[1]), ln=1, align="C")
-                pdf.cell(200, 10, txt=str(user[2]), ln=1, align="C")
-                pdf.cell(200, 10, txt=str(user[3]), ln=1, align="C")
-                pdf.cell(200, 10, txt=str(user[4]), ln=1, align="C")
+            pdf.ln()
 
-                #get phone extension
-                phone_extension = user[5][0:2]
-                pdf.cell(200, 10, txt=str(phone_extension), ln=1, align="C")
+        # Save PDF
+        pdf.output("current_users_report.pdf")
 
-                #get phone number
-                phone_number = user[5][2:]
-                pdf.cell(200, 10, txt=str(phone_number), ln=1, align="C")
+        # Show success message
+        messagebox.showinfo("Success", "Current Users Report Generated Successfully")
 
-                pdf.cell(200, 10, txt=str(user[6]), ln=1, align="C")
-                pdf.cell(200, 10, txt=str(user[7]), ln=1, align="C")
-
-            #save pdf
-            pdf.output("all_users_report.pdf")
-
-            #show success message
-            messagebox.showinfo("Success", "All Users Report Generated Successfully")
-
-            #show location of pdf
-            messagebox.showinfo("Success", "All Users Report Generated Successfully at "+os.getcwd())
+        # Show location of PDF
+        messagebox.showinfo("Success", "Current Users Report Generated Successfully at "+os.getcwd())
 
 
 
