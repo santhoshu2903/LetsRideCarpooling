@@ -18,9 +18,37 @@ class Controller:
     def get_all_locations(self):
         return self.model.get_all_locations()
     
+    #get_rides_by_from_location_to_location_and_date
+    def get_rides_by_from_location_to_location_and_date(self,from_location,to_location,date):
+        return self.model.get_rides_by_from_location_to_location_and_date(from_location,to_location,date)
+    
     #get_locationid_by_locationname
     def get_locationid_by_locationname(self,locationname):
         return self.model.get_locationid_by_locationname(locationname)
+    
+    #get_rides_by_from_location_and_to_location
+    def get_rides_by_from_location_and_to_location(self,from_location,to_location):
+        return self.model.get_rides_by_from_location_and_to_location(from_location,to_location)
+    
+    #get_rides_by_from_location_and_date
+    def get_rides_by_from_location_and_date(self,from_location,date):
+        return self.model.get_rides_by_from_location_and_date(from_location,date)
+    
+    #get_rides_by_date
+    def get_rides_by_date(self,date):
+        return self.model.get_rides_by_date(date)
+    
+    #get_rides_by_to_location
+    def get_rides_by_to_location(self,to_location):
+        return self.model.get_rides_by_to_location(to_location)
+    
+    #get_rides_by_from_location
+    def get_rides_by_from_location(self,from_location):
+        return self.model.get_rides_by_from_location(from_location)
+    
+    #get_rides_by_to_location_and_date
+    def get_rides_by_to_location_and_date(self,to_location,date):
+        return self.model.get_rides_by_to_location_and_date(to_location,date)
     
     #convert_time
     def convert_time(self,time):
@@ -63,6 +91,11 @@ class Controller:
     #get_all_confirmed_rides_by_user
     def get_all_confirmed_rides_by_user(self,userid):
         return self.model.get_all_confirmed_rides_by_user(userid)
+    
+    #get_routes_by_routesid
+    def get_routes_by_routesid(self,routeid):
+        return self.model.get_routes_by_routesid(routeid)
+    
 
 
     #confirm ride
@@ -83,9 +116,13 @@ class Controller:
     def registerUser(self,first_name, last_name,gmail, username, complete_phone_number, dob):
         return self.model.insertUser(first_name, last_name,gmail, username,self.generatePassword(), complete_phone_number, dob)
     
+    #add_route
+    def add_route(self,stops):
+        return self.model.add_route(stops)
+    
 
-    def add_ride(self, driverid,drivername,from_location, to_location, date, time,available_seats):
-        return self.model.add_ride(driverid,drivername,from_location, to_location, date, time,available_seats)
+    def add_ride(self, driverid,drivername,from_location, to_location, date, time,available_seats,routeid):
+        return self.model.add_ride(driverid,drivername,from_location, to_location, date, time,available_seats,routeid)
     
     def get_current_user_object(self,phone_number):
         return self.model.get_User_by_phone_number(phone_number)  

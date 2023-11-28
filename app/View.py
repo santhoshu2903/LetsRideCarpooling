@@ -35,6 +35,13 @@ class View(ctk.CTk):
         self.users_table_data = self.controller.get_all_users()
         self.locations_table_data = self.controller.get_all_locations()
 
+        self.final_rides_table_data = []
+
+        # for ride in self.rides_table_data:
+        #     routes = ride[8]
+        #     routesNames=self.controller.get_routes_by_routesid(routes)
+
+
 
     def show_welcome(self):
         self.clear_content()
@@ -434,11 +441,24 @@ class View(ctk.CTk):
         self.to_location_label = ctk.CTkLabel(self.frame["new_ride"], text="To Location : ", fg_color="transparent", font=("Helvetica", 14, "bold"))
         self.to_location_label.grid(row=3, column=0, sticky="e", padx=10, pady=10)
 
-        #to locations combobox
+                #to locations combobox
         self.to_location_combobox = ctk.CTkComboBox(self.frame["new_ride"], values=[location[1] for location in self.locations_table_data])
         self.to_location_combobox.grid(row=3, column=1, sticky="w", padx=10, pady=10)
         #combobox width
         self.to_location_combobox.configure(width=300)
+
+        #no of stops
+        self.no_of_stops_label = ctk.CTkLabel(self.frame["new_ride"], text="No of Stops : ", fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.no_of_stops_label.grid(row=4, column=0, sticky="e", padx=10, pady=10)
+
+        #no of stops entry
+        self.no_of_stops_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
+        self.no_of_stops_entry.grid(row=4, column=1, sticky="w", padx=10, pady=10)
+
+        #keyrelease event on no of stops entry
+        self.no_of_stops_entry.bind("<KeyRelease>", self.no_of_stops_entry_keyrelease)
+
+
 
 
         # self.to_location_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
@@ -446,35 +466,35 @@ class View(ctk.CTk):
 
         # #create date label and entry side by side
         self.date_label = ctk.CTkLabel(self.frame["new_ride"], text="Date : ",fg_color="transparent", font=("Helvetica", 14, "bold"))
-        self.date_label.grid(row=4, column=0, sticky="e", padx=10, pady=10)
+        self.date_label.grid(row=5, column=0, sticky="e", padx=10, pady=10)
 
         # self.date_entry =DateEntry(self.frame["new_ride"], date_pattern="MM/dd/yyyy", font=("Arial", 15))
         # self.date_entry.grid(row=4, column=1, sticky="w", padx=10, pady=10)
 
         self.date_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent",placeholder_text="MM/DD/YYYY",  font=("Helvetica", 14, "bold"),width=300)
-        self.date_entry.grid(row=4, column=1, sticky="w", padx=10, pady=10)
+        self.date_entry.grid(row=5, column=1, sticky="w", padx=10, pady=10)
 
         #create time label and entry side by side
         self.time_label = ctk.CTkLabel(self.frame["new_ride"], text=" Start Time : ", fg_color="transparent", font=("Helvetica", 14, "bold"))
-        self.time_label.grid(row=5, column=0, sticky="e", padx=10, pady=10)
+        self.time_label.grid(row=6, column=0, sticky="e", padx=10, pady=10)
 
         self.time_entry = ctk.CTkEntry(self.frame["new_ride"],placeholder_text="HH:MM AM/PM", fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
-        self.time_entry.grid(row=5, column=1, sticky="w", padx=10, pady=10)
+        self.time_entry.grid(row=6, column=1, sticky="w", padx=10, pady=10)
 
         #crate available seats label and entry side by side
         self.available_seats_label = ctk.CTkLabel(self.frame["new_ride"], text="Available Seats : ", fg_color="transparent", font=("Helvetica", 14, "bold"))
-        self.available_seats_label.grid(row=6, column=0, sticky="e", padx=10, pady=10)
+        self.available_seats_label.grid(row=7, column=0, sticky="e", padx=10, pady=10)
 
         self.available_seats_entry = ctk.CTkEntry(self.frame["new_ride"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
-        self.available_seats_entry.grid(row=6, column=1, sticky="w", padx=10, pady=10)
+        self.available_seats_entry.grid(row=7, column=1, sticky="w", padx=10, pady=10)
 
         #create submit button
         self.submit_button = ctk.CTkButton(self.frame["new_ride"], text="Submit",command=self.send_ride_data)
-        self.submit_button.grid(row=7, column=1, sticky="w", padx=10, pady=10)
+        self.submit_button.grid(row=8, column=1, sticky="w", padx=10, pady=10)
 
         #create back button to create rides frame  
         self.back_button = ctk.CTkButton(self.frame["new_ride"], text="Back",command=lambda :  self.show_home_page_frame("give_ride"))
-        self.back_button.grid(row=8, column=1, sticky="w", padx=10, pady=10)
+        self.back_button.grid(row=9, column=1, sticky="w", padx=10, pady=10)
 
         #create my rides frame as frame["my_rides"]
         self.frame["my_rides"] = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
@@ -568,13 +588,18 @@ class View(ctk.CTk):
 
         
         #3 entries in one row , from ,to, date and time
-        self.search_for_ride_search_bar_entry = ctk.CTkEntry(self.frame["search_for_ride"],width=150, placeholder_text="from ").grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
-        self.search_for_ride_search_bar_entry = ctk.CTkEntry(self.frame["search_for_ride"],width=150, placeholder_text="to").grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
-        self.search_for_ride_search_bar_entry = ctk.CTkEntry(self.frame["search_for_ride"],width=150, placeholder_text="date").grid(row=1, column=2, sticky="nsew", padx=10, pady=10)
+        self.search_for_ride_search_bar_from_entry = ctk.CTkEntry(self.frame["search_for_ride"],width=150, placeholder_text="from")
+        self.search_for_ride_search_bar_from_entry.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+
+        self.search_for_ride_search_bar_to_entry = ctk.CTkEntry(self.frame["search_for_ride"],width=150, placeholder_text="to")
+        self.search_for_ride_search_bar_to_entry.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
+
+        self.search_for_ride_search_bar_date_entry = ctk.CTkEntry(self.frame["search_for_ride"],width=150, placeholder_text="date")
+        self.search_for_ride_search_bar_date_entry.grid(row=1, column=2, sticky="nsew", padx=10, pady=10)
 
 
         #search button display corresponding data in the below table
-        self.search_for_ride_search_button = ctk.CTkButton(self.frame["search_for_ride"], text="Search",command=lambda : self.show_home_page_frame("search_for_ride"))
+        self.search_for_ride_search_button = ctk.CTkButton(self.frame["search_for_ride"], text="Search",command=self.search_rides)
         self.search_for_ride_search_button.grid(row=1, column=4, sticky="ne", padx=10, pady=10)
 
         #headers lists
@@ -605,6 +630,9 @@ class View(ctk.CTk):
         self.search_for_ride_table.edit_row(0,text_color="blue",hover_color="light blue")
         self.search_for_ride_table.grid(sticky="nsew", padx=10, pady=10)
 
+        #table column width
+        # self.search_for_ride_table.columns[0].width = 10
+
         self.search_for_ride_table_selector = CTkTableRowSelector(self.search_for_ride_table)
         #confirm ride button on selected row redirects to new frame within search for ride frame
         #confirm ride frame as frame["confirm_ride"]
@@ -616,7 +644,6 @@ class View(ctk.CTk):
     def confirm_ride_page(self):
         self.current_ride_data = self.search_for_ride_table_selector.get()
         user_details = self.current_user_object
-
 
         #check if current ride data is empty
         if self.current_ride_data == []:
@@ -709,6 +736,78 @@ class View(ctk.CTk):
         self.passenger_back_button = ctk.CTkButton(self.frame["confirm_ride"], text="Back",command=lambda : self.show_home_page_frame("search_for_ride"))
         self.passenger_back_button.grid(row=8, column=1, sticky="w", padx=10, pady=10)
 
+    #no_of_stops_entry_keyrelease
+    def no_of_stops_entry_keyrelease(self,event):
+        #open a new window to enter stops
+        #get no of stops from no_of_stops_entry
+        no_of_stops = self.no_of_stops_entry.get()
+        print(no_of_stops)
+        #check if no of stops is empty
+        if int(no_of_stops) == 0:
+            return
+        #open a new window
+        self.new_window = tk.Toplevel(self)
+        self.new_window.geometry("1000x700")
+        stops_label=["First Stop","Second Stop","Third Stop"]
+        self.add_stops_label = ctk.CTkLabel(self.new_window, text="Add Stops in Order", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.add_stops_label.grid(row=0, column=0,columnspan=2, sticky="w", padx=10, pady=10)
+        if int(no_of_stops) >= 1:
+            #locations combobox
+            self.stop_name_label1 = ctk.CTkLabel(self.new_window, text=stops_label[0], fg_color="transparent", font=("Helvetica", 14, "bold"))
+            self.stop_name_label1.grid(row=1, column=0, sticky="e", padx=10, pady=10)
+
+            self.stop_name_combobox1 = ctk.CTkComboBox(self.new_window, values=[location[1] for location in self.locations_table_data])
+            self.stop_name_combobox1.grid(row=1, column=1, sticky="w", padx=10, pady=10)
+            #combobox width
+            self.stop_name_combobox1.configure(width=300)
+        if int(no_of_stops) >= 2:
+            self.stop_name_label2 = ctk.CTkLabel(self.new_window, text=stops_label[1], fg_color="transparent", font=("Helvetica", 14, "bold"))
+            self.stop_name_label2.grid(row=2, column=0, sticky="e", padx=10, pady=10)
+
+            self.stop_name_combobox2 = ctk.CTkComboBox(self.new_window, values=[location[1] for location in self.locations_table_data])
+            self.stop_name_combobox2.grid(row=2, column=1, sticky="w", padx=10, pady=10)
+            #combobox width
+            self.stop_name_combobox2.configure(width=300)
+
+        if int(no_of_stops) == 3:
+            self.stop_name_label3 = ctk.CTkLabel(self.new_window, text=stops_label[2], fg_color="transparent", font=("Helvetica", 14, "bold"))
+            self.stop_name_label3.grid(row=3, column=0, sticky="e", padx=10, pady=10)
+
+            self.stop_name_combobox3 = ctk.CTkComboBox(self.new_window, values=[location[1] for location in self.locations_table_data])
+            self.stop_name_combobox3.grid(row=3, column=1, sticky="w", padx=10, pady=10)
+            #combobox width
+            self.stop_name_combobox3.configure(width=300)
+
+        
+
+
+        #Add stops button
+        self.add_stops_button = ctk.CTkButton(self.new_window, text="Add Stops",command=self.add_stops)
+        self.add_stops_button.grid(row=int(no_of_stops)+2, column=1, sticky="w", padx=10, pady=10)
+
+        #back button
+        self.back_button = ctk.CTkButton(self.new_window, text="Back",command=self.new_window.destroy)
+        self.back_button.grid(row=int(no_of_stops)+2, column=0, sticky="w", padx=10, pady=10)
+
+
+    #add_stops
+    def add_stops(self):
+        #get stops from comboboxs insert into stops list
+        stops=[]
+        if int(self.no_of_stops_entry.get()) >= 1:
+            stops.append(self.stop_name_combobox1.get())
+        if int(self.no_of_stops_entry.get()) >= 2:
+            stops.append(self.stop_name_combobox2.get())
+        if int(self.no_of_stops_entry.get()) == 3:
+            stops.append(self.stop_name_combobox3.get())
+        #insert stops 
+        self.stops= stops
+        print(self.stops)
+        #destroy new window
+        self.new_window.destroy()
+
+
+
     #send ride data to controller
     def send_ride_data(self):
         #get data from new ride frame
@@ -724,9 +823,6 @@ class View(ctk.CTk):
         time = datetime.strptime(time, '%I:%M %p').time()
         available_seats = self.available_seats_entry.get()
 
-        #clear all entries
-        # self.from_location_combobox.delete(0, "end")
-        # self.to_location_combobox.delete(0, "end")
         self.date_entry.delete(0, "end")
         self.time_entry.delete(0, "end")
         self.available_seats_entry.delete(0, "end")
@@ -736,9 +832,14 @@ class View(ctk.CTk):
         
         print(driverid,driver_name, from_location_id, to_location_id, date, time,available_seats)
 
+        if self.stops:
+            self.stops=[self.controller.get_locationid_by_locationname(stop) for stop in self.stops]
+
+        route_id = self.controller.add_route(self.stops)
         #send data to controller
-        new_ride=self.controller.add_ride(driverid,driver_name, from_location_id, to_location_id, date, time,available_seats)
+        new_ride=self.controller.add_ride(driverid,driver_name, from_location_id, to_location_id, date, time,available_seats,route_id)
         if new_ride:
+            #replace with new ride data
             self.search_for_ride_table.add_row([new_ride[2],new_ride[3],new_ride[4],new_ride[5],new_ride[6],new_ride[7]])
             self.give_ride_table.add_row([new_ride[0],new_ride[3],new_ride[4],new_ride[5],new_ride[6],new_ride[7]])
         
@@ -877,6 +978,79 @@ class View(ctk.CTk):
 
             #show location of pdf
             messagebox.showinfo("Success", "All Confirmed Rides Report Generated Successfully at "+os.getcwd())
+
+
+    #search_rides
+    #search rides based on from location, to location and date
+    def search_rides(self):
+        # print("reached")
+        #get data from search for ride frame
+        try:
+            from_location = self.search_for_ride_search_bar_from_entry.get()
+            from_location = self.controller.get_locationid_by_locationname(from_location)
+        except:
+            from_location = ""
+        try: 
+            to_location = self.search_for_ride_search_bar_to_entry.get()
+            to_location = self.controller.get_locationid_by_locationname(to_location)
+        except:
+            to_location = ""
+        try:
+            date = self.search_for_ride_search_bar_date_entry.get()
+            date = datetime.strptime(date, '%m/%d/%Y').date()
+        except:
+            date = ""
+
+        #if all fields are not empty
+        if from_location != "" and to_location != "" and date != "":
+            #get rides by from location, to location and date
+            rides = self.controller.get_rides_by_from_location_to_location_and_date(from_location,to_location,date)
+        elif from_location != "" and to_location != "":
+            #get rides by from location and to location
+            rides = self.controller.get_rides_by_from_location_and_to_location(from_location,to_location)
+        elif from_location != "" and date != "":
+            #get rides by from location and date
+            rides = self.controller.get_rides_by_from_location_and_date(from_location,date)
+        elif to_location != "" and date != "":
+            #get rides by to location and date
+            rides = self.controller.get_rides_by_to_location_and_date(to_location,date)
+        elif from_location != "":
+            #get rides by from location
+            rides = self.controller.get_rides_by_from_location(from_location)
+        elif to_location != "":
+            #get rides by to location
+            rides = self.controller.get_rides_by_to_location(to_location)
+        elif date != "":
+            #get rides by date
+            rides = self.controller.get_rides_by_date(date)
+        else:
+            #get all rides
+            rides = self.controller.get_all_rides()
+
+        final_data=[["Driver Name", "From Location", "To Location", "Date", "Start Time","Available Seats"]]
+        for ride in rides:
+            ride= list(ride)
+            from_location = self.controller.get_location_by_locationid(ride[3])
+            to_location = self.controller.get_location_by_locationid(ride[4])
+            date = ride[5]
+            #convert date to string
+            date = date.strftime("%m/%d/%Y")
+            time = self.controller.convert_time(ride[6])
+            final_data+=[[ride[2],from_location,to_location,date,time,ride[7]]]
+
+        # print(final_data)
+
+        # clear search for ride table frame
+        self.search_for_ride_table_frame.grid_forget()
+
+        #table frame
+        self.search_for_ride_table_frame = ctk.CTkFrame(self.frame["search_for_ride"], fg_color="transparent", corner_radius=0)
+        self.search_for_ride_table_frame.grid(row=2, column=0, columnspan=5, sticky="nsew", padx=10, pady=10)
+
+        #clear the search for ride table
+        self.search_for_ride_table= ctkTable.CTkTable(self.search_for_ride_table_frame,values=final_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
+        self.search_for_ride_table.edit_row(0,text_color="blue",hover_color="light blue")
+        self.search_for_ride_table.grid(sticky="nsew", padx=10, pady=10)
 
 
 

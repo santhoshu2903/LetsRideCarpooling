@@ -47,24 +47,14 @@ class Model:
             );
         ''')
 
-        #create index for locations table on locationid
-        # cursor.execute('''CREATE INDEX locationid_index ON locations (locationid)''')
-        # Create the routes table if it doesn't exist
+
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS routes (
                 routeid INT AUTO_INCREMENT PRIMARY KEY,
-                from_location VARCHAR(255) NOT NULL,
-                to_location VARCHAR(255) NOT NULL
-            );
-        ''')
-
-        #create table for route paths if it doesn't exist
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS route_paths (
-                route_pathid INT AUTO_INCREMENT PRIMARY KEY,
-                routeid INT NOT NULL,
-                path VARCHAR(255) NOT NULL,
-                FOREIGN KEY (routeid) REFERENCES routes(routeid)
+                routesid INT ,
+                order_number INT,
+                locationid INT,
+                foreign key (locationid) references locations(locationid)
             );
         ''')
 
@@ -79,11 +69,15 @@ class Model:
                 date date NOT NULL,
                 time TIME NOT NULL,
                 available_seats INT NOT NULL,
+                routesid INT NOT NULL,
                 FOREIGN KEY (driverid) REFERENCES users(userid),
                 FOREIGN KEY (from_location_id) REFERENCES locations(locationid),
                 FOREIGN KEY (to_location_id) REFERENCES locations(locationid)
                 );
         ''')
+                #create index for locations table on locationid
+        # cursor.execute('''CREATE INDEX locationid_index ON locations (locationid)''')
+        # Create the routes table if it doesn't exist
 
         #create a table for confirmedrides
         cursor.execute('''
@@ -119,6 +113,76 @@ class Model:
         user = cursor.fetchone()
         conn.close()
         return user
+    
+    #get_all_rides_by_from_location
+    def get_all_rides_by_from_location(self,from_location):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM rides WHERE from_location_id = %s''',(from_location,))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
+    
+    #get_rides_by_from_location
+    def get_rides_by_from_location(self,from_location):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM rides WHERE from_location_id = %s''',(from_location,))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
+    
+    #get_rides_by_date
+    def get_rides_by_date(self,date):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM rides WHERE date = %s''',(date,))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
+    
+    #get_rides_by_to_location
+    def get_rides_by_to_location(self,to_location):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM rides WHERE to_location_id = %s''',(to_location,))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
+    
+    #get_rides_by_from_location_and_date
+    def get_rides_by_from_location_and_date(self,from_location,date):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM rides WHERE from_location_id = %s AND date = %s''',(from_location,date))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
+    
+    #get_rides_by_from_location_and_to_location
+    def get_rides_by_from_location_and_to_location(self,from_location,to_location):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM rides WHERE from_location_id = %s AND to_location_id = %s''',(from_location,to_location))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
+    
+    #get_rides_by_from_location_to_location_and_date
+    def get_rides_by_from_location_to_location_and_date(self,from_location,to_location,date):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT * FROM rides WHERE from_location_id = %s AND to_location_id = %s AND date = %s''',(from_location,to_location,date))
+        rides = cursor.fetchall()
+        conn.close()
+        return rides
     #get_all_confirmed_rides
     def get_all_confirmed_rides(self):
         conn = mysql.connect(**self.letsride_database)
@@ -138,6 +202,22 @@ class Model:
         ride = cursor.fetchone()
         conn.close()
         return ride
+    
+    #add_route
+    def add_route(self,stops):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+        #get last routesid
+        cursor.execute('''SELECT routesid FROM routes ORDER BY routesid DESC LIMIT 1''')
+        routesid = cursor.fetchone()
+        if routesid is None:
+            routesid = 1
+        else:
+            routesid = routesid[0] + 1
+        for i,stop in enumerate(stops):
+            cursor.execute('''INSERT INTO routes (routesid,order_number,locationid) VALUES (%s,%s,%s)''',(routesid,i+1,stop))
+            conn.commit()
+        return routesid
     
     #get_all_locations
     def get_all_locations(self):
@@ -184,7 +264,14 @@ class Model:
         conn.close()
         return ride
 
-
+    # #add_route
+    # def add_route(self,stops):
+    #     conn = mysql.connect(**self.letsride_database)
+    #     cursor = conn.cursor()
+    #     cursor.execute('''INSERT INTO routes (order_number,locationid) VALUES (%s,%s)''',(stops[0],stops[1]))
+    #     conn.commit()
+    #     conn.close()
+    #     return True
     #confirm ride
     def confirm_ride(self,rideid,userid,no_of_seats):
         conn = mysql.connect(**self.letsride_database)
@@ -220,14 +307,14 @@ class Model:
         conn.close()
         return rideid
 
-    def add_ride(self, driverid, drivername, from_location, to_location, date, time, available_seats):
+    def add_ride(self, driverid, drivername, from_location, to_location, date, time, available_seats,routeid):
         conn = mysql.connect(**self.letsride_database)
         cursor = conn.cursor()
 
         cursor.execute('''
-            INSERT INTO rides (driverid, drivername, from_location_id, to_location_id, date, time, available_seats)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        ''', (driverid, drivername, from_location, to_location, date, time, available_seats))
+            INSERT INTO rides (driverid, drivername, from_location_id, to_location_id, date, time, available_seats,routesid)
+            VALUES (%s, %s, %s, %s, %s, %s, %s,%s)
+        ''', (driverid, drivername, from_location, to_location, date, time, available_seats,routeid))
         conn.commit()
 
         cursor.execute("SELECT * FROM rides WHERE rideid = LAST_INSERT_ID();")
@@ -283,6 +370,7 @@ class Model:
 
     #get_locationid_by_locationname
     def get_locationid_by_locationname(self,locationname):
+        print(locationname)
         conn = mysql.connect(**self.letsride_database)
         cursor = conn.cursor()
 
@@ -290,6 +378,21 @@ class Model:
         locationid = cursor.fetchone()
         conn.close()
         return locationid[0]
+    
+    #get_routes_by_routesid
+    def get_routes_by_routesid(self,routesid):
+        routes_name = []
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT order_number,locationid FROM routes WHERE routesid = %s''',(routesid,))
+        routes = cursor.fetchall()
+        for route in routes:
+            routes=[route[0],self.get_location_by_locationid(route[1])]
+            routes_name.append(routes)
+        conn.close()
+        return routes_name
+
     
     #get_all_rides_count
     def get_all_rides_count(self):
