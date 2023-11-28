@@ -1,3 +1,4 @@
+from datetime import datetime
 from tkinter import *
 import Model
 import View
@@ -13,6 +14,23 @@ class Controller:
         self.randInt = random.randint
         # self.view= View.View()
 
+    #get_all_locations
+    def get_all_locations(self):
+        return self.model.get_all_locations()
+    
+    #get_locationid_by_locationname
+    def get_locationid_by_locationname(self,locationname):
+        return self.model.get_locationid_by_locationname(locationname)
+    
+    #convert_time
+    def convert_time(self,time):
+        time="".join(list(str(time).split(":"))[:2])
+        #convert string to datetime object
+        time = datetime.strptime(time, '%H%M')
+        #convert datetime object to HH:MM AM/PM format
+        time = time.strftime("%I:%M %p")
+        return time
+    
 
     #check_if_already_booked
     def check_if_already_booked(self,rideid,userid):
@@ -50,6 +68,11 @@ class Controller:
     #confirm ride
     def confirm_ride(self,rideid,userid,no_of_seats):
         return self.model.confirm_ride( rideid,userid,no_of_seats)
+    
+    #get_User_name_by_userid
+    def get_User_name_by_userid(self,userid):
+        return self.model.get_User_name_by_userid(userid)
+    
     
     #get_rideid_by_ridedetails
 
@@ -98,6 +121,10 @@ class Controller:
     #get_all_confirmed_rides
     def get_all_confirmed_rides(self):
         return self.model.get_all_confirmed_rides()
+    
+    #get_location_by_locationid 
+    def get_location_by_locationid(self,locationid):
+        return self.model.get_location_by_locationid(locationid)
     
 
     def sendOtp(self,phoneNumber):

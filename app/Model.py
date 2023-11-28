@@ -2,20 +2,26 @@ import mysql.connector as mysql
 
 class Model:
     def __init__(self):
+        try:
+            self.letsride_database = {
+                'user': 'root',
+                'password': 'root',
+                'host': 'localhost',
+                'port': 3306,
+                'database': 'letsride'
+                }
+
+            self.init_db()
+        #database accessing error
+        except mysql.Error as err:
+            print(err)
+            print("Error connecting to database. Please check your connection settings and try again.")
+            exit(1)
         
-        self.letsride_database = {
-            'user': 'root',
-            'password': 'root',
-            'host': 'localhost',
-            'port': 3306,
-            'database': 'letsride'
-        }
-
-        self.init_db()
-
-
-
     def init_db(self):
+
+
+        #connect again to the database
         conn = mysql.connect(**self.letsride_database)
         cursor = conn.cursor()
 
@@ -33,19 +39,50 @@ class Model:
             );
         ''')
 
+        #create table locations if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS locations (
+                locationid INT AUTO_INCREMENT PRIMARY KEY,
+                location VARCHAR(255) NOT NULL
+            );
+        ''')
+
+        #create index for locations table on locationid
+        # cursor.execute('''CREATE INDEX locationid_index ON locations (locationid)''')
+        # Create the routes table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS routes (
+                routeid INT AUTO_INCREMENT PRIMARY KEY,
+                from_location VARCHAR(255) NOT NULL,
+                to_location VARCHAR(255) NOT NULL
+            );
+        ''')
+
+        #create table for route paths if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS route_paths (
+                route_pathid INT AUTO_INCREMENT PRIMARY KEY,
+                routeid INT NOT NULL,
+                path VARCHAR(255) NOT NULL,
+                FOREIGN KEY (routeid) REFERENCES routes(routeid)
+            );
+        ''')
+
         # Create the 'rides' table if it doesn't exist
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS rides (
                 rideid INT AUTO_INCREMENT PRIMARY KEY,
                 driverid INT NOT NULL,
                 drivername VARCHAR(255) NOT NULL,
-                from_location VARCHAR(255) NOT NULL,
-                to_location VARCHAR(255) NOT NULL,
-                date VARCHAR(255) NOT NULL,
-                time VARCHAR(255) NOT NULL,
+                from_location_id INT NOT NULL,
+                to_location_id INT NOT NULL,
+                date date NOT NULL,
+                time TIME NOT NULL,
                 available_seats INT NOT NULL,
-                FOREIGN KEY (driverid) REFERENCES users(userid)
-            );
+                FOREIGN KEY (driverid) REFERENCES users(userid),
+                FOREIGN KEY (from_location_id) REFERENCES locations(locationid),
+                FOREIGN KEY (to_location_id) REFERENCES locations(locationid)
+                );
         ''')
 
         #create a table for confirmedrides
@@ -60,6 +97,7 @@ class Model:
             );
         ''')
 
+        #add database name to the dictionary
         conn.close()
 
     #get_all_confirmed_rides_by_rideid
@@ -100,6 +138,16 @@ class Model:
         ride = cursor.fetchone()
         conn.close()
         return ride
+    
+    #get_all_locations
+    def get_all_locations(self):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT * FROM locations')
+        locations = cursor.fetchall()
+        conn.close()
+        return locations
 
 
     #update_available_seats
@@ -150,13 +198,24 @@ class Model:
         conn.close()
         return ride
 
-
-    #get_rideid_by_ridedetails
-    def get_rideid_by_ridedetails(self,drivername,from_location,to_location,date,time,available_seats):
+    #get_User_name_by_userid
+    def get_User_name_by_userid(self,userid):
         conn = mysql.connect(**self.letsride_database)
         cursor = conn.cursor()
 
-        cursor.execute('''SELECT rideid FROM rides WHERE drivername = %s AND from_location = %s AND to_location = %s AND date = %s AND time = %s AND available_seats=%s''', (drivername,from_location,to_location,date,time,available_seats))
+        cursor.execute('''SELECT first_name FROM users WHERE userid = %s''',(userid,))
+        first_name = cursor.fetchone()
+        conn.close()
+        return first_name[0]
+    
+    #get_rideid_by_ridedetails
+    def get_rideid_by_ridedetails(self,drivername,from_location,to_location,date,time,available_seats):
+        print(drivername,from_location,to_location,date,time,available_seats)
+        print(type(drivername),type(from_location),type(to_location),type(date),type(time),type(available_seats))
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT rideid FROM rides WHERE drivername = %s AND from_location_id = %s AND to_location_id = %s AND date = %s AND time = %s AND available_seats=%s''', (drivername,from_location,to_location,date,time,available_seats))
         rideid = cursor.fetchone()
         conn.close()
         return rideid
@@ -166,7 +225,7 @@ class Model:
         cursor = conn.cursor()
 
         cursor.execute('''
-            INSERT INTO rides (driverid, drivername, from_location, to_location, date, time, available_seats)
+            INSERT INTO rides (driverid, drivername, from_location_id, to_location_id, date, time, available_seats)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         ''', (driverid, drivername, from_location, to_location, date, time, available_seats))
         conn.commit()
@@ -175,7 +234,17 @@ class Model:
         ride = cursor.fetchone()
         conn.close()
         return ride
+    #get_location_by_locationid
+    def get_location_by_locationid(self,locationid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
 
+        cursor.execute('''SELECT * FROM locations WHERE locationid = %s''',(locationid,))
+        location = cursor.fetchone()
+
+        conn.close()
+        return location[1]
+    
     #get_all_users
     def get_all_users(self):
         conn = mysql.connect(**self.letsride_database)
@@ -210,6 +279,17 @@ class Model:
         rides = cursor.fetchall()
         conn.close()
         return rides
+    
+
+    #get_locationid_by_locationname
+    def get_locationid_by_locationname(self,locationname):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT locationid FROM locations WHERE location = %s''',(locationname,))
+        locationid = cursor.fetchone()
+        conn.close()
+        return locationid[0]
     
     #get_all_rides_count
     def get_all_rides_count(self):
