@@ -216,7 +216,7 @@ class Controller:
         rides_objects= self.model.get_all_rides()
         rides_data =[]
         for ride in rides_objects:
-            rides_data.append([ride[0],ride[1],ride[2],ride[3],ride[4],ride[5],ride[6],ride[7]])
+            rides_data.append([ride[0],ride[1],ride[2],ride[3],ride[4],ride[5],ride[6],ride[7],ride[8]])
         return rides_data
     
 

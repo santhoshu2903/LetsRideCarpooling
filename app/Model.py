@@ -213,7 +213,10 @@ class Model:
         if routesid is None:
             routesid = 1
         else:
-            routesid = routesid[0] + 1
+            if len(stops)==0:
+                routesid = 0
+            else:
+                routesid = routesid[0] + 1
         for i,stop in enumerate(stops):
             cursor.execute('''INSERT INTO routes (routesid,order_number,locationid) VALUES (%s,%s,%s)''',(routesid,i+1,stop))
             conn.commit()
@@ -388,8 +391,7 @@ class Model:
         cursor.execute('''SELECT order_number,locationid FROM routes WHERE routesid = %s''',(routesid,))
         routes = cursor.fetchall()
         for route in routes:
-            routes=[route[0],self.get_location_by_locationid(route[1])]
-            routes_name.append(routes)
+            routes_name.append(self.get_location_by_locationid(route[1]))
         conn.close()
         return routes_name
 

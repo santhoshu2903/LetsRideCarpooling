@@ -37,9 +37,6 @@ class View(ctk.CTk):
 
         self.final_rides_table_data = []
 
-        # for ride in self.rides_table_data:
-        #     routes = ride[8]
-        #     routesNames=self.controller.get_routes_by_routesid(routes)
 
 
 
@@ -603,13 +600,14 @@ class View(ctk.CTk):
         self.search_for_ride_search_button.grid(row=1, column=4, sticky="ne", padx=10, pady=10)
 
         #headers lists
-        headers = [["Driver Name", "From Location", "To Location", "Date", "Start Time","Available Seats"]]
+        headers = [["Ride ID","Driver Name", "From Location", "To Location", "Date", "Start Time","Available Seats"]]
 
         #table data
         self.table_data = headers
         
         #insert rider name, from location, to location, date, time in table_data
         for ride in self.rides_table_data:
+            print(ride)
             driver_name = self.controller.get_User_name_by_userid(ride[1])
             if self.login_as.get() == "Passenger" and ride[1] == self.current_user_object[0]:
                 continue
@@ -619,7 +617,17 @@ class View(ctk.CTk):
             #convert date to string
             date = date.strftime("%m/%d/%Y")
             time = self.controller.convert_time(ride[6])
-            self.table_data.append([ride[2],from_location,to_location,date,time,ride[7]])
+            self.table_data.append([ride[0],ride[2],from_location,to_location,date,time,ride[7]])
+            routes=ride[8]
+            if routes:
+                routenames=self.controller.get_routes_by_routesid(routes)
+                self.current_route_names=[from_location]+routenames+[to_location]
+                route_paths=self.create_routes(self.current_route_names)
+                for path in route_paths:
+                    print(path)
+                    self.table_data.append([ride[0],ride[2],path[0],path[1],date,time,ride[7]])
+            
+
 
         #table frame
         self.search_for_ride_table_frame = ctk.CTkFrame(self.frame["search_for_ride"], fg_color="transparent", corner_radius=0)
@@ -629,6 +637,8 @@ class View(ctk.CTk):
         self.search_for_ride_table= ctkTable.CTkTable(self.search_for_ride_table_frame,values=self.table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
         self.search_for_ride_table.edit_row(0,text_color="blue",hover_color="light blue")
         self.search_for_ride_table.grid(sticky="nsew", padx=10, pady=10)
+
+        # self.search_for_ride_table.select_column(0,visible=False)
 
         #table column width
         # self.search_for_ride_table.columns[0].width = 10
@@ -832,9 +842,11 @@ class View(ctk.CTk):
         
         print(driverid,driver_name, from_location_id, to_location_id, date, time,available_seats)
 
-        if self.stops:
-            self.stops=[self.controller.get_locationid_by_locationname(stop) for stop in self.stops]
-
+        try:
+            if self.stops:
+                self.stops=[self.controller.get_locationid_by_locationname(stop) for stop in self.stops]
+        except:
+            self.stops=[]
         route_id = self.controller.add_route(self.stops)
         #send data to controller
         new_ride=self.controller.add_ride(driverid,driver_name, from_location_id, to_location_id, date, time,available_seats,route_id)
@@ -1111,6 +1123,14 @@ class View(ctk.CTk):
         messagebox.showinfo("Success", "All Rides Report Generated Successfully")
         #show location of pdf
         messagebox.showinfo("Success", "All Rides Report Generated Successfully at "+os.getcwd())
+
+    #create_routes
+    def create_routes(self,route_names):
+        pairs = []
+        for i in range(len(route_names) - 1):
+            pair = [route_names[i], route_names[i + 1]]
+            pairs.append(pair)
+        return pairs
 
 
     #get_all_users_report
