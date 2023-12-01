@@ -59,13 +59,16 @@ class Controller:
         time = time.strftime("%I:%M %p")
         return time
     
+    #add_stops
+    def add_stops(self,rideid,stops):
+        return self.model.add_stops(rideid,stops)
 
     #check_if_already_booked
     def check_if_already_booked(self,rideid,userid):
         return self.model.check_if_already_booked(rideid,userid)
     #update_available_seats
-    def update_available_seats(self,rideid,available_seats):
-        return self.model.update_available_seats(rideid,available_seats)
+    def update_available_seats(self,rideid,difference):
+        return self.model.update_available_seats(rideid,difference)
     
     #get_rides_count_by_driverid
     def get_rides_count_by_driverid(self,driverid):
@@ -82,6 +85,10 @@ class Controller:
     #get_active_passengers_count
     def get_active_passengers_count(self):
         return self.model.get_active_passengers_count()
+    
+    #add_available_seats
+    def add_available_seats(self,rideid,from_location_id,to_location_id,available_seats):
+        return self.model.add_available_seats(rideid,from_location_id,to_location_id,available_seats)
 
 
     #.get_ride_by_rideid
@@ -91,12 +98,13 @@ class Controller:
     #get_all_confirmed_rides_by_user
     def get_all_confirmed_rides_by_user(self,userid):
         return self.model.get_all_confirmed_rides_by_user(userid)
-    
-    #get_routes_by_routesid
-    def get_routes_by_routesid(self,routeid):
-        return self.model.get_routes_by_routesid(routeid)
-    
-
+   
+    #check_if_already_booked_ride
+    def check_if_already_booked_ride(self,rideid,userid):
+        return self.model.check_if_already_booked_ride(rideid,userid)
+    #update_available_seats
+    def update_available_seats(self,rideid,available_seats):
+        return self.model.update_available_seats(rideid,available_seats)
 
     #confirm ride
     def confirm_ride(self,rideid,userid,no_of_seats):
@@ -115,14 +123,14 @@ class Controller:
 
     def registerUser(self,first_name, last_name,gmail, username, complete_phone_number, dob):
         return self.model.insertUser(first_name, last_name,gmail, username,self.generatePassword(), complete_phone_number, dob)
-    
-    #add_route
-    def add_route(self,stops):
-        return self.model.add_route(stops)
+
+    #get_ride_id_by_drivername_from_location_to_location_date_time_available_seats
+    def get_ride_id_by_drivername_from_location_to_location_date_time_available_seats(self,drivername,from_location,to_location,date,time,available_seats):
+        return self.model.get_ride_id_by_drivername_from_location_to_location_date_time_available_seats(drivername,from_location,to_location,date,time,available_seats)
     
 
-    def add_ride(self, driverid,drivername,from_location, to_location, date, time,available_seats,routeid):
-        return self.model.add_ride(driverid,drivername,from_location, to_location, date, time,available_seats,routeid)
+    def add_ride(self, driverid,drivername,from_location, to_location, date, time,available_seats,connecting=False,connecting_rideid=None):
+        return self.model.add_ride(driverid,drivername,from_location, to_location, date, time,available_seats,connecting,connecting_rideid)
     
     def get_current_user_object(self,phone_number):
         return self.model.get_User_by_phone_number(phone_number)  
@@ -211,15 +219,18 @@ class Controller:
         #for testing match it with blank
         return True
     
+    #check_if_already_booked_ride
+    def check_if_already_booked_ride(self,rideid,userid):
+        return self.model.check_if_already_booked_ride(rideid,userid)
 
     def get_all_rides(self):
         rides_objects= self.model.get_all_rides()
         rides_data =[]
         for ride in rides_objects:
-            rides_data.append([ride[0],ride[1],ride[2],ride[3],ride[4],ride[5],ride[6],ride[7],ride[8]])
+            rides_data.append([ride[0],ride[1],ride[2],ride[3],ride[4],ride[5],ride[6],ride[7]])
         return rides_data
     
-
+        
     #random password generator aplhanumeric and special characters
     def generatePassword(self):
         password = ''
