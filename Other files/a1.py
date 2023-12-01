@@ -38,7 +38,7 @@ tab_control.add(tab3, text='Most Booked Locations')
 
 tab_control.pack(expand=1, fill='both')
 
-# Method to fetch data and plot rides per day
+# Method to fetch data and return rides per day plot
 def plot_rides_per_day():
     cursor.execute('''
         SELECT date, COUNT(rideid) as num_rides
@@ -63,13 +63,12 @@ def plot_rides_per_day():
     ax.set_ylabel('Number of Rides')
     ax.set_title('Number of Rides Per Day')
 
-    # Draw the plot on Tkinter canvas
-    canvas.draw()
+    return figure
 
-# Method to fetch data and plot active users
+# Method to fetch data and return active users plot
 def plot_active_users():
     cursor.execute('''
-        SELECT date, COUNT(userid) as num_active_users
+        SELECT date, COUNT(driverid) as num_active_users
         FROM rides
         GROUP BY date;
     ''')
@@ -91,10 +90,9 @@ def plot_active_users():
     ax.set_ylabel('Number of Active Users')
     ax.set_title('Number of Active Users Per Day')
 
-    # Draw the plot on Tkinter canvas
-    canvas.draw()
+    return figure
 
-# Method to fetch data and plot most booked ride locations
+# Method to fetch data and return most booked ride locations plot
 def plot_most_booked_locations():
     cursor.execute('''
         SELECT location, COUNT(rideid) as num_bookings
@@ -122,23 +120,31 @@ def plot_most_booked_locations():
     ax.set_ylabel('Number of Bookings')
     ax.set_title('Most Booked Ride Locations')
 
-    # Draw the plot on Tkinter canvas
-    canvas.draw()
+    return figure
 
 # Add buttons to each tab to trigger the corresponding plot
-rides_button = tk.Button(tab1, text="Plot Rides per Day", command=plot_rides_per_day)
+def display_plot(plot_function):
+    global canvas  # Declare canvas as global
+    # Get the plot from the function
+    plot = plot_function()
+
+    # Clear previous plot on Tkinter canvas
+    if 'canvas' in globals():
+        canvas.get_tk_widget().destroy()
+
+    # Create Matplotlib canvas with the new plot
+    canvas = FigureCanvasTkAgg(plot, master=app)
+    canvas_widget = canvas.get_tk_widget()
+    canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+rides_button = tk.Button(tab1, text="Plot Rides per Day", command=lambda: display_plot(plot_rides_per_day))
 rides_button.pack()
 
-users_button = tk.Button(tab2, text="Plot Active Users", command=plot_active_users)
+users_button = tk.Button(tab2, text="Plot Active Users", command=lambda: display_plot(plot_active_users))
 users_button.pack()
 
-locations_button = tk.Button(tab3, text="Plot Most Booked Locations", command=plot_most_booked_locations)
+locations_button = tk.Button(tab3, text="Plot Most Booked Locations", command=lambda: display_plot(plot_most_booked_locations))
 locations_button.pack()
-
-# Create Matplotlib canvas
-canvas = FigureCanvasTkAgg(figure, master=app)
-canvas_widget = canvas.get_tk_widget()
-canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
 # Run the Tkinter main loop
 app.mainloop()

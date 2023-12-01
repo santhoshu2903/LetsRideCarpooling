@@ -47,21 +47,6 @@ class Model:
             );
         ''')
 
-        #create stops table if it doesn't exist
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS stops (
-                stopid INT AUTO_INCREMENT PRIMARY KEY,
-                rideid INT NOT NULL,
-                location1_id INT NOT NULL,
-                location2_id INT ,
-                location3_id INT,
-                FOREIGN KEY (rideid) REFERENCES rides(rideid),
-                FOREIGN KEY (location1_id) REFERENCES locations(locationid),
-                FOREIGN KEY (location2_id) REFERENCES locations(locationid),
-                FOREIGN KEY (location3_id) REFERENCES locations(locationid)
-            );
-        ''')
-
         # Create the 'rides' table if it doesn't exist
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS rides (
@@ -80,6 +65,23 @@ class Model:
                 FOREIGN KEY (to_location_id) REFERENCES locations(locationid)
                 );
         ''')
+
+        
+        #create stops table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS stops (
+                stopid INT AUTO_INCREMENT PRIMARY KEY,
+                rideid INT NOT NULL,
+                location1_id INT NOT NULL,
+                location2_id INT ,
+                location3_id INT,
+                FOREIGN KEY (rideid) REFERENCES rides(rideid),
+                FOREIGN KEY (location1_id) REFERENCES locations(locationid),
+                FOREIGN KEY (location2_id) REFERENCES locations(locationid),
+                FOREIGN KEY (location3_id) REFERENCES locations(locationid)
+            );
+        ''')
+
 
                 #create stops table if it doesn't exist
         cursor.execute('''
@@ -378,6 +380,30 @@ class Model:
         conn.commit()
         conn.close()
         return True
+    
+    #get_most_booked_locations
+    def get_most_booked_locations(self):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT l.location, COUNT(*) AS ride_count
+                            FROM rides r
+                            JOIN locations l ON r.from_location_id = l.locationid
+                            GROUP BY r.from_location_id;
+                            ''')
+        locations = cursor.fetchall()
+        conn.close()
+        return locations
+    
+    #get_rides_per_day
+    def get_rides_per_day(self):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT date, COUNT(*) FROM rides GROUP BY date''')
+        rides_per_day = cursor.fetchall()
+        conn.close()
+        return rides_per_day
     
     #get_all_rideids_by_userid
     def get_all_rideids_by_userid(self,userid):
