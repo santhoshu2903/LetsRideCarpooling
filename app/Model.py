@@ -81,6 +81,22 @@ class Model:
                 );
         ''')
 
+                #create stops table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS stops (
+                stopid INT AUTO_INCREMENT PRIMARY KEY,
+                rideid INT NOT NULL,
+                location1_id INT NOT NULL,
+                location2_id INT ,
+                location3_id INT,
+                FOREIGN KEY (rideid) REFERENCES rides(rideid),
+                FOREIGN KEY (location1_id) REFERENCES locations(locationid),
+                FOREIGN KEY (location2_id) REFERENCES locations(locationid),
+                FOREIGN KEY (location3_id) REFERENCES locations(locationid)
+            );
+        ''')
+
+
 
         #create a table for confirmedrides
         cursor.execute('''
@@ -331,6 +347,51 @@ class Model:
         to_location_id = cursor.fetchone()
         conn.close()
         return to_location_id[0]
+    
+    #get_available_seats_by_rideid
+    def get_available_seats_by_rideid(self,rideid):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT available_seats FROM rides WHERE rideid = %s''',(rideid,))
+        available_seats = cursor.fetchone()
+        conn.close()
+        return available_seats[0]
+    
+    #update_user_details
+    def update_user_details(self,userid,first_name,last_name,email,phone_number,dob):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''UPDATE users SET first_name = %s, last_name = %s, email = %s, phone_number = %s, dob = %s WHERE userid = %s''',(first_name,last_name,email,phone_number,dob,userid))
+        conn.commit()
+        conn.close()
+        return True
+    
+    
+    #update_password
+    def update_password(self,userid,password):
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''UPDATE users SET password = %s WHERE userid = %s''',(password,userid))
+        conn.commit()
+        conn.close()
+        return True
+    
+    #get_all_rideids_by_userid
+    def get_all_rideids_by_userid(self,userid):
+        ride_ids=[]
+        conn = mysql.connect(**self.letsride_database)
+        cursor = conn.cursor()
+
+        cursor.execute('''SELECT rideid FROM rides WHERE driverid = %s''',(userid,))
+        rides = cursor.fetchall()
+        conn.close()
+        for ride in rides:
+            ride_ids.append(ride[0])
+        return ride_ids
+    
     
 
     #get_effected_location_ids

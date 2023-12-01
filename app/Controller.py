@@ -62,6 +62,15 @@ class Controller:
     #add_stops
     def add_stops(self,rideid,stops):
         return self.model.add_stops(rideid,stops)
+    
+    #get_all_rideids_by_userid
+    def get_all_rideids_by_userid(self,userid):
+        return self.model.get_all_rideids_by_userid(userid)
+    
+
+    #get_available_seats_by_rideid
+    def get_available_seats_by_rideid(self,rideid):
+        return self.model.get_available_seats_by_rideid(rideid)
 
     #check_if_already_booked
     def check_if_already_booked(self,rideid,userid):
@@ -230,6 +239,11 @@ class Controller:
             rides_data.append([ride[0],ride[1],ride[2],ride[3],ride[4],ride[5],ride[6],ride[7]])
         return rides_data
     
+    #update_user_details
+    def update_user_details(self,userid,first_name,last_name,username,phone_number,dob):
+        return self.model.update_user_details(userid,first_name,last_name,username,phone_number,dob)
+    
+    
         
     #random password generator aplhanumeric and special characters
     def generatePassword(self):
@@ -240,6 +254,11 @@ class Controller:
         
     def update_password(self,phone_number,new_password):
         return self.model.update_password(phone_number,new_password)
+    
+    #update_password
+    def update_password(self,phone_number,new_password):
+        return self.model.update_password(phone_number,new_password)
+    
 
 
     # Add similar methods for retrieving users, handling user interactions, etc.
