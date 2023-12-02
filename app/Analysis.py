@@ -6,7 +6,7 @@ import Model
 import pandas as pd  # Import Pandas
 import customtkinter as ctk
 
-class RideSharingAnalysis:
+class LetsRideAnalysis:
     def __init__(self, root):
         self.root = root
         self.root.title("Ride-Sharing Analysis")
@@ -14,9 +14,12 @@ class RideSharingAnalysis:
 
         # Figure to display the plot
         self.figure = Figure(figsize=(20, 4), dpi=60)
-
         # Canvas to display the figure
         self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
+
+        self.plot_rides_day()
+        self.plot_rides_hour()
+        self.most_booked_locations()
 
     def plot_rides_day(self):
         try:
@@ -24,33 +27,26 @@ class RideSharingAnalysis:
             data = self.model.get_rides_per_day()
 
             if not isinstance(data, pd.DataFrame):
-                # If data is not a DataFrame, attempt to convert it
                 data = pd.DataFrame(data)
 
             if data.empty:
-                # No data to plot, show a message box
                 messagebox.showinfo("No Data", "No ride data available for analysis.")
                 return None
             
             day, rides = zip(*data.values)
-
-            # Clear the figure
             self.figure.clear()
 
-            # Add subplot to the figure
             ax = self.figure.add_subplot(111)
-
-            # Plot the data
             ax.bar(day, rides)
-            # Set the title
             ax.set_title('Rides per day')
-
-            # Set the x-label
             ax.set_xlabel('Day')
-
-            # Set the y-label
             ax.set_ylabel('Rides')
 
+            self.canvas.draw()
+            self.canvas.get_tk_widget().pack()
+
+            #save as image
+            self.figure.savefig('Analytical reports/Rides_per_day.png', bbox_inches='tight')
 
             # Return the canvas for additional use if needed
             return self.figure
@@ -66,11 +62,9 @@ class RideSharingAnalysis:
             data = self.model.get_most_booked_locations()
 
             if not isinstance(data, pd.DataFrame):
-                # If data is not a DataFrame, attempt to convert it
                 data = pd.DataFrame(data)
 
             if data.empty:
-                # No data to plot, show a message box
                 messagebox.showinfo("No Data", "No ride data available for analysis.")
                 return None
             
@@ -78,48 +72,25 @@ class RideSharingAnalysis:
 
             # Clear the figure
             self.figure.clear()
-
-            # Add subplot to the figure
             ax = self.figure.add_subplot(111)
-
-            # Plot the data
             ax.bar(location,rides)
             # Set the title
             ax.set_title('Most booked locations')
-
-            # Set the x-label
             ax.set_xlabel('Location')
+            for i, v in enumerate(rides):
+                ax.text(i, v+0.5, str(v), color='blue', fontweight='bold')
 
             # Set the y-label
             ax.set_ylabel('Rides')
 
-            
+            self.canvas.draw()
+            self.canvas.get_tk_widget().pack()
+
+            #save as image
+            self.figure.savefig('Analytical reports/Most_booked_locations.png', bbox_inches='tight')
             return self.figure
 
         except Exception as e:
             # Handle exceptions and show an error message
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
             return None
-        
-if __name__ == '__main__':
-    root = ctk.CTk()
-    app = RideSharingAnalysis(root)
-    
-    # # Attempt to plot rides per day
-    # canvas = app.plot_rides_day()
-    # if canvas:
-    #     # If canvas is not None, pack it
-    #     canvas.get_tk_widget().pack()
-
-    frame = tk.Frame(root)
-    frame.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
-    Figure = app.most_booked_locations()
-    if Figure:
-        # If canvas is not None, pack it
-        canvas=FigureCanvasTkAgg(Figure, master=frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack()
-    
-
-    root.mainloop()

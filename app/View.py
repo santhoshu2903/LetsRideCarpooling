@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime
 import itertools
 import tkinter as tk
@@ -13,6 +14,7 @@ import os
 from fpdf import FPDF
 from PIL import Image, ImageTk
 import Analysis as Ans
+import xlsxwriter
 
 class View(ctk.CTk):
     def __init__(self):
@@ -249,7 +251,7 @@ class View(ctk.CTk):
         for ride in self.display_rides_data:
             self.rides_table_data.append([ride[0],ride[2],ride[3],ride[4],ride[5],ride[6],ride[7]])
         #table frame
-        self.rides_table_frame = ctk.CTkScrollableFrame(self.pdf_reports_notebook.tab("Rides Reports"), fg_color="transparent", corner_radius=0,width=700,height=450)
+        self.rides_table_frame = ctk.CTkScrollableFrame(self.pdf_reports_notebook.tab("Rides Reports"), fg_color="transparent", corner_radius=0,width=700,height=400)
         self.rides_table_frame.pack(fill="both", expand=True)
 
         #table
@@ -300,15 +302,34 @@ class View(ctk.CTk):
         self.users_table.edit_row(0,text_color="blue",hover_color="light blue")
         self.users_table.pack(fill="both", expand=True)
 
+
+
+
         #print as pdf button in all tabs
-        self.print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Rides Reports"), text="Print as PDF",command=self.get_all_rides_reports)
-        self.print_as_pdf_button.pack()
+        self.rides_print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Rides Reports"), text="Print",command=self.get_all_rides_reports)
+        self.rides_print_as_pdf_button.pack(padx=10,pady=10, side="right")
 
-        self.print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Confirmed Rides Reports"), text="Print as PDF",command=self.get_all_confirmed_rides_reports)
-        self.print_as_pdf_button.pack()
+        #print as combobox in csv, pdf, excel
+        self.rides_print_as_combobox = ctk.CTkComboBox(self.pdf_reports_notebook.tab("Rides Reports"), values=["CSV", "PDF", "Excel","Txt"],corner_radius=0)
+        self.rides_print_as_combobox.pack(padx=10,pady=10, side="right")
+        #bottom center
 
-        self.print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Users Reports"), text="Print as PDF",command=self.get_all_users_reports)
-        self.print_as_pdf_button.pack()
+        #print as pdf button in all tabs
+        self.confirmed_rides_print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Confirmed Rides Reports"), text="Print",command=self.get_all_confirmed_rides_reports)
+        self.confirmed_rides_print_as_pdf_button.pack(padx=10,pady=10, side="right")
+
+        #print as combobox in csv, pdf, excel
+        self.confirmed_rides_print_as_combobox = ctk.CTkComboBox(self.pdf_reports_notebook.tab("Confirmed Rides Reports"), values=["CSV", "PDF", "Excel","Txt"],corner_radius=0)
+        self.confirmed_rides_print_as_combobox.pack(padx=10,pady=10, side="right")
+
+        #print as pdf button in all tabs
+        self.users_print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Users Reports"), text="Print",command=self.get_all_users_reports)
+        self.users_print_as_pdf_button.pack(padx=10,pady=10, side="right")
+
+        #print as combobox in csv, pdf, excel
+        self.users_print_as_combobox = ctk.CTkComboBox(self.pdf_reports_notebook.tab("Users Reports"), values=["CSV", "PDF", "Excel","Txt"],corner_radius=0)
+        self.users_print_as_combobox.pack(padx=10,pady=10, side="right")
+
         # rides reports frame
         # logout button
         self.logout_button = ctk.CTkButton(self, text="Logout",command=self.show_welcome)
@@ -503,7 +524,7 @@ class View(ctk.CTk):
 
         #label to display name and count of rides
         self.current_user_name_and_rides_count_label = ctk.CTkLabel(self.frame["give_ride"], text="Welcome "+self.current_user_name+" ! You have "+str(self.current_user_rides_count[0])+" active rides", fg_color="transparent", font=("Helvetica", 20, "bold"))
-        self.current_user_name_and_rides_count_label.grid(row=0, column=1, sticky="nesw", padx=10, pady=10)
+        self.current_user_name_and_rides_count_label.grid(row=0, column=1,columnspan=3, sticky="nesw", padx=10, pady=10)
 
 
         #create create ride button top right corner
@@ -1578,63 +1599,7 @@ class View(ctk.CTk):
         # print(paths_combinations
 
     #get_all_confirmed_rides_report
-    #get all confirmed rides from database and create a pdf report
-    def get_all_confirmed_rides_reports(self):
-            
-            #get all confirmed rides data
-            all_confirmed_rides_data = self.confirmed_rides_table_data()
     
-            #create pdf
-            pdf = FPDF(orientation='L')
-            pdf.add_page()
-            pdf.set_font("Arial", size=12)
-    
-            #add title to page
-            pdf.cell(200, 10, txt="All Confirmed Rides Report", ln=1, align="C")
-    
-            #add header to table
-            pdf.cell(30, 10, txt="Ride ID", border=1)
-            pdf.cell(50, 10, txt="Driver Name", border=1)
-            pdf.cell(50, 10, txt="Passenger Name", border=1)
-            pdf.cell(50, 10, txt="From Location", border=1)
-            pdf.cell(50, 10, txt="To Location", border=1)
-            pdf.cell(30, 10, txt="Date", border=1)
-            pdf.cell(30, 10, txt="Time", border=1)
-            pdf.cell(30, 10, txt="Seats Booked", border=1)
-            pdf.ln()
-    
-            #add ride data to table
-            for ride in all_confirmed_rides_data:
-                ride_details = self.controller.get_ride_by_rideid(ride[1])
-                ride_id = ride_details[0]
-                driver_name = ride_details[2]
-                user_details = self.controller.get_user_by_userid(ride[2])
-                passenger_name = user_details[1] + " " + user_details[2]
-                from_location = ride_details[3]
-                to_location = ride_details[4]
-                date = ride_details[5]
-                time = ride_details[6]
-                seats_booked = ride[3]
-
-                pdf.cell(30, 10, txt=str(ride_id), border=1)
-                pdf.cell(50, 10, txt=driver_name, border=1)
-                pdf.cell(50, 10, txt=passenger_name, border=1)
-                pdf.cell(50, 10, txt=from_location, border=1)
-                pdf.cell(50, 10, txt=to_location, border=1)
-                pdf.cell(30, 10, txt=date, border=1)
-                pdf.cell(30, 10, txt=time, border=1)
-                pdf.cell(30, 10, txt=str(seats_booked), border=1)
-
-                pdf.ln()
-
-            #save pdf
-            pdf.output("all_confirmed_rides_report.pdf")
-
-            #show success message
-            messagebox.showinfo("Success", "All Confirmed Rides Report Generated Successfully")
-
-            #show location of pdf
-            messagebox.showinfo("Success", "All Confirmed Rides Report Generated Successfully at "+os.getcwd())
 
     #search_give_rides
     #search rides based on from location, to location and date
@@ -1712,6 +1677,150 @@ class View(ctk.CTk):
         #add ctktable row selector
         self.give_ride_table_selector = CTkTableRowSelector(self.give_ride_table)
 
+
+    #get_all_users_reports
+    #get all users from database and create a pdf report
+    def get_all_users_reports(self):
+        #get all users data type
+
+        printtype = self.users_print_as_combobox.get()
+        # print(printtype)
+        #get all users data
+        all_users_data = self.controller.get_all_users()
+        # print(all_users_data)
+        if printtype=="Pdf":
+            #create pdf
+            pdf = FPDF(orientation='L')
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            
+            #todays date and time
+            #top left corner
+            pdf.cell(200, 10, txt="Date: "+str(datetime.now().strftime("%m/%d/%Y %H:%M:%S")), ln=1, align="L")
+
+            #add title to page
+            pdf.cell(200, 10, txt="All Users Report", ln=1, align="C")
+
+            #add header to table
+            pdf.cell(30, 10, txt="User ID", border=1)
+            pdf.cell(50, 10, txt="First Name", border=1)
+            pdf.cell(50, 10, txt="Last Name", border=1)
+            pdf.cell(50, 10, txt="Email", border=1)
+            pdf.cell(50, 10, txt="Phone Number", border=1)
+            pdf.cell(30, 10, txt="Date of Birth", border=1)
+            pdf.cell(30, 10, txt="Username", border=1)
+            pdf.ln()
+
+            #add user data to table
+            for user in all_users_data:
+                user_id = user[0]
+                first_name = user[1]
+                last_name = user[2]
+                email = user[3]
+                phone_number = user[6]
+                date_of_birth = user[4]
+                username = user[5]
+
+                pdf.cell(30, 10, txt=str(user_id), border=1)
+                pdf.cell(50, 10, txt=first_name, border=1)
+                pdf.cell(50, 10, txt=last_name, border=1)
+                pdf.cell(50, 10, txt=email, border=1)
+                pdf.cell(50, 10, txt=phone_number, border=1)
+                pdf.cell(30, 10, txt=date_of_birth, border=1)
+                pdf.cell(30, 10, txt=username, border=1)
+
+                pdf.ln()
+
+            #save pdf
+            pdf.output("reports/all_users_report.pdf")
+
+            #show success message
+            messagebox.showinfo("Success", "All Users Report Generated Successfully")
+
+            #show location of pdf
+            messagebox.showinfo("Success", "All Users Report Generated Successfully at "+os.getcwd())
+        
+        elif printtype=="Excel":
+            #create excel
+            wb = Workbook()
+            ws = wb.active
+
+            #add title to page
+            ws['A1'] = "All Users Report"
+
+            #add header to table
+            ws['A3'] = "User ID"
+            ws['B3'] = "First Name"
+            ws['C3'] = "Last Name"
+            ws['D3'] = "Email"
+            ws['E3'] = "Phone Number"
+            ws['F3'] = "Date of Birth"
+            ws['G3'] = "Username"
+
+            #add user data to table
+            for user in all_users_data:
+                user_id = user[0]
+                first_name = user[1]
+                last_name = user[2]
+                email = user[3]
+                phone_number = user[6]
+                date_of_birth = user[4]
+                username = user[5]
+
+                ws.append([user_id,first_name,last_name,email,phone_number,date_of_birth,username])
+
+            #save excel
+            wb.save("reports/all_users_report.xlsx")
+
+            #show success message
+            messagebox.showinfo("Success", "All Users Report Generated Successfully")
+
+            #show location of excel
+            messagebox.showinfo("Success", "All Users Report Generated Successfully at "+os.getcwd())
+        elif printtype=="CSV":
+            #create csv
+            with open('reports/all_users_report.csv', 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["User ID", "First Name", "Last Name", "Email", "Phone Number", "Date of Birth", "Username"])
+                for user in all_users_data:
+                    user_id = user[0]
+                    first_name = user[1]
+                    last_name = user[2]
+                    email = user[3]
+                    phone_number = user[6]
+                    date_of_birth = user[4]
+                    username = user[5]
+
+                    writer.writerow([user_id,first_name,last_name,email,phone_number,date_of_birth,username])
+
+            #show success message
+            messagebox.showinfo("Success", "All Users Report Generated Successfully")
+
+            #show location of csv
+            messagebox.showinfo("Success", "All Users Report Generated Successfully at "+os.getcwd())
+        elif printtype=="Txt":
+            #create txt
+            with open('reports/all_users_report.txt', 'w') as file:
+                file.write("All Users Report\n\n")
+                file.write("User ID\tFirst Name\tLast Name\tEmail\tPhone Number\tDate of Birth\tUsername\n")
+                for user in all_users_data:
+                    user_id = user[0]
+                    first_name = user[1]
+                    last_name = user[2]
+                    email = user[3]
+                    phone_number = user[6]
+                    date_of_birth = user[4]
+                    username = user[5]
+
+                    file.write(str(user_id)+"\t"+first_name+"\t"+last_name+"\t"+email+"\t"+phone_number+"\t"+date_of_birth+"\t"+username+"\n")
+
+            #show success message
+            messagebox.showinfo("Success", "All Users Report Generated Successfully")
+
+            #show location of txt
+            messagebox.showinfo("Success", "All Users Report Generated Successfully at "+os.getcwd())
+
+        
 
 
 
@@ -1880,60 +1989,233 @@ class View(ctk.CTk):
         self.my_rides_table.grid(sticky="nsew", padx=10, pady=10)
 
         #add ctktable row selector
-        self.my_rides_table_selector = CTkTableRowSelector(self.my_rides_table)                                                                                     
+        self.my_rides_table_selector = CTkTableRowSelector(self.my_rides_table)                
+
+    #get_all_confirmed_rides_reports
+    def get_all_confirmed_rides_reports(self):
+        #get all confirmed rides print type
+        printype=self.confirmed_rides_print_as_combobox.get()
+
+        if printype=="PDF":
+            #get all confirmed rides data
+            all_confirmed_rides_data = self.display_confirmed_rides_data
+    
+            #create pdf
+            pdf = FPDF(orientation='L')
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+
+            #todays date and time
+            #top left corner
+            pdf.cell(200, 10, txt="Date: "+str(datetime.now().strftime("%m/%d/%Y %H:%M:%S")), ln=1, align="L")
+
+    
+            #add title to page
+            pdf.cell(200, 40, txt="All Confirmed Rides Report", ln=1, align="C")
+    
+            #add header to table
+            pdf.cell(30, 10, txt="Ride ID", border=1)
+            pdf.cell(50, 10, txt="Driver Name", border=1)
+            pdf.cell(50, 10, txt="From Location", border=1)
+            pdf.cell(50, 10, txt="To Location", border=1)
+            pdf.cell(30, 10, txt="Date", border=1)
+            pdf.cell(30, 10, txt="Time", border=1)
+            pdf.cell(30, 10, txt="Seats Booked", border=1)
+            pdf.ln()
+    
+            #add ride data to table
+            for ride in all_confirmed_rides_data:
+                ride_id=ride[0]
+                driver_name=ride[1]
+                from_location=ride[2]
+                to_location=ride[3]
+                date=ride[4]
+                time=ride[5]
+                seats_booked=ride[6]
+                pdf.cell(30, 10, txt=str(ride_id), border=1)
+                pdf.cell(50, 10, txt=driver_name, border=1)
+                pdf.cell(50, 10, txt=from_location, border=1)
+                pdf.cell(50, 10, txt=to_location, border=1)
+                pdf.cell(30, 10, txt=date, border=1)
+                pdf.cell(30, 10, txt=time, border=1)
+                pdf.cell(30, 10, txt=str(seats_booked), border=1)
+
+                pdf.ln()
+
+            #save pdf
+            pdf.output("reports/all_confirmed_rides_report.pdf")
+        
+        elif printype=="CSV":
+            #get all confirmed rides data
+            all_confirmed_rides_data = self.display_confirmed_rides_data
+    
+            #save as csv file
+            with open('reports/all_confirmed_rides_report.csv', 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Ride ID", "Driver Name", "From Location", "To Location", "Date", "Start Time","Seats Booked"])
+                for ride in all_confirmed_rides_data:
+                    writer.writerow([ride[0],ride[1],ride[2],ride[3],ride[4],ride[5],ride[6]])
+        elif printype=="Excel":
+            #get all confirmed rides data
+            all_confirmed_rides_data = self.display_confirmed_rides_data
+    
+            #save as excel file
+            workbook = xlsxwriter.Workbook('reports/all_confirmed_rides_report.xlsx')
+            worksheet = workbook.add_worksheet()
+            row = 0
+            col = 0
+            worksheet.write(row, col, "Ride ID")
+            worksheet.write(row, col+1, "Driver Name")
+            worksheet.write(row, col+2, "From Location")
+            worksheet.write(row, col+3, "To Location")
+            worksheet.write(row, col+4, "Date")
+            worksheet.write(row, col+5, "Start Time")
+            worksheet.write(row, col+6, "Seats Booked")
+            row+=1
+            for ride in self.display_confirmed_rides_data:
+                ride_id = ride[1]
+                driver_name = ride[2]
+                from_location = ride[3]
+                to_location = ride[4]
+                date = ride[5]
+                time = ride[6]
+                seats_booked = ride[7]
+
+                worksheet.write(row, col, ride_id)
+                worksheet.write(row, col+1, driver_name)
+                worksheet.write(row, col+2, from_location)
+                worksheet.write(row, col+3, to_location)
+                worksheet.write(row, col+4, date)
+                worksheet.write(row, col+5, time)
+                worksheet.write(row, col+6, seats_booked)
+                row+=1
+            workbook.close()
+        elif printype=="Txt":
+            #get all confirmed rides data
+            all_confirmed_rides_data = self.display_confirmed_rides_data
+    
+            #save as txt file
+            with open('reports/all_confirmed_rides_report.txt', 'w') as file:
+                file.write("Ride ID,Driver Name,Passenger Name,From Location,To Location,Date,Start Time,Seats Booked\n")
+                for ride in self.display_confirmed_rides_data:
+                    ride_id = ride[0]
+                    driver_name = ride[1]
+                    from_location = ride[2]
+                    to_location = ride[3]
+                    date = ride[4]
+                    time = ride[5]
+                    seats_booked = ride[6]                    
+                    file.write(str(ride_id)+","+driver_name+","+from_location+","+to_location+","+str(date)+","+str(time)+","+str(seats_booked)+"\n")
+            
+        #show success message
+        messagebox.showinfo("Success", "All Confirmed Rides Report Generated Successfully")
+        #show location of pdf
+        messagebox.showinfo("Success", "All Confirmed Rides Report Generated Successfully at "+os.getcwd())
+
+    #get_all_confirmed_rides_reports
+    #get all confirmed rides from database and create a pdf report
+
+
+
+                                                                           
 
 
     #get_all_rides_reports
     #get all rides from database and create a pdf report
     def get_all_rides_reports(self):
+        
+        #print as combo box
+        printype=self.rides_print_as_combobox.get()
+        # print(printype)
 
-        #get all rides data
-        all_rides_data = self.rides_table_data
+        if printype=="PDF":
+            #create pdf
+            # pdf = FPDF()
+            # pdf.add_page()
+            pdf = FPDF(orientation='L')
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
 
-        #create pdf
-        # pdf = FPDF()
-        # pdf.add_page()
-        pdf = FPDF(orientation='L')
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
+            #todays date and time
+            #top left corner
+            pdf.cell(200, 10, txt="Date: "+str(datetime.now().strftime("%m/%d/%Y %H:%M:%S")), ln=1, align="L")
 
-        #add title to page
-        pdf.cell(200, 10, txt="All Rides Report", ln=1, align="C")
+            #add title to page
+            pdf.cell(200, 10, txt="All Rides Report", ln=1, align="C")
 
-        #add header to table
-        pdf.cell(30, 10, txt="Ride ID", border=1)
-        pdf.cell(50, 10, txt="Driver Name", border=1)
-        pdf.cell(50, 10, txt="From Location", border=1)
-        pdf.cell(50, 10, txt="To Location", border=1)
-        pdf.cell(30, 10, txt="Date", border=1)
-        pdf.cell(30, 10, txt="Time", border=1)
-        pdf.cell(30, 10, txt="Available Seats", border=1)
-        pdf.ln()
-
-        #add ride data to table
-        for ride in all_rides_data:
-            ride_id = ride[0]
-            driver_name = ride[2]
-            from_location = ride[3]
-            to_location = ride[4]
-            date = ride[5]
-            time = ride[6]
-            available_seats = ride[7]
-
-            pdf.cell(30, 10, txt=str(ride_id), border=1)
-            pdf.cell(50, 10, txt=driver_name, border=1)
-            pdf.cell(50, 10, txt=from_location, border=1)
-            pdf.cell(50, 10, txt=to_location, border=1)
-            pdf.cell(30, 10, txt=date, border=1)
-            pdf.cell(30, 10, txt=time, border=1)
-            pdf.cell(30, 10, txt=str(available_seats), border=1)
-    
+            #add header to table
+            pdf.cell(30, 10, txt="Ride ID", border=1)
+            pdf.cell(50, 10, txt="Driver Name", border=1)
+            pdf.cell(50, 10, txt="From Location", border=1)
+            pdf.cell(50, 10, txt="To Location", border=1)
+            pdf.cell(30, 10, txt="Date", border=1)
+            pdf.cell(30, 10, txt="Time", border=1)
+            pdf.cell(30, 10, txt="Available Seats", border=1)
             pdf.ln()
 
+            #add ride data to table
+            for ride in self.display_rides_data:
+                ride_id = ride[0]
+                driver_name = ride[2]
+                from_location = ride[3]
+                to_location = ride[4]
+                date = ride[5]
+                time = ride[6]
+                available_seats = ride[7]
 
-        #save pdf
-        pdf.output("all_rides_report.pdf")
+                pdf.cell(30, 10, txt=str(ride_id), border=1)
+                pdf.cell(50, 10, txt=driver_name, border=1)
+                pdf.cell(50, 10, txt=from_location, border=1)
+                pdf.cell(50, 10, txt=to_location, border=1)
+                pdf.cell(30, 10, txt=date, border=1)
+                pdf.cell(30, 10, txt=time, border=1)
+                pdf.cell(30, 10, txt=str(available_seats), border=1)
         
+                pdf.ln()
+
+
+            #save pdf
+            pdf.output("reports/all_rides_report.pdf")
+        elif printype=="CSV":
+            #save as csv file
+            with open('reports/all_rides_report.csv', 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Ride ID", "Driver Name", "From Location", "To Location", "Date", "Start Time","Available Seats"])
+                for ride in self.display_rides_data:
+                    writer.writerow(ride)
+        elif printype=="Excel":
+            #save as excel file
+            workbook = xlsxwriter.Workbook('reports/all_rides_report.xlsx')
+            worksheet = workbook.add_worksheet()
+            row = 0
+            col = 0
+            worksheet.write(row, col, "Ride ID")
+            worksheet.write(row, col+1, "Driver Name")
+            worksheet.write(row, col+2, "From Location")
+            worksheet.write(row, col+3, "To Location")
+            worksheet.write(row, col+4, "Date")
+            worksheet.write(row, col+5, "Start Time")
+            worksheet.write(row, col+6, "Available Seats")
+            row+=1
+            for ride in self.display_rides_data:
+                worksheet.write(row, col, ride[0])
+                worksheet.write(row, col+1, ride[2])
+                worksheet.write(row, col+2, ride[3])
+                worksheet.write(row, col+3, ride[4])
+                worksheet.write(row, col+4, ride[5])
+                worksheet.write(row, col+5, ride[6])
+                worksheet.write(row, col+6, ride[7])
+                row+=1
+            workbook.close()
+        elif type=="Txt":
+            #save as txt file
+            with open('reports/all_rides_report.txt', 'w') as file:
+                file.write("Ride ID,Driver Name,From Location,To Location,Date,Start Time,Available Seats\n")
+                for ride in self.display_rides_data:
+                    file.write(str(ride[0])+","+ride[2]+","+ride[3]+","+ride[4]+","+str(ride[5])+","+str(ride[6])+","+str(ride[7])+"\n")
+        
+
+
         #show success message
         messagebox.showinfo("Success", "All Rides Report Generated Successfully")
         #show location of pdf
@@ -1948,50 +2230,7 @@ class View(ctk.CTk):
             pairs.append(pair)
         return pairs
 
-    #get_all_users_report
-    #get all users from database and create a pdf report
-    def get_all_users_reports(self):
-        # Get all users data
-        all_users_data = self.controller.get_all_users()
 
-        # Create PDF
-        pdf = FPDF(orientation='L')
-        pdf.add_page()
-
-        # Add a title to the page
-        pdf.set_font("Arial", size=20)
-        pdf.cell(200, 10, txt="Current Users Report", ln=1, align="C")
-
-        # Add a header to the table
-        pdf.set_font("Arial", size=12)
-        pdf.cell(30, 10, txt="User ID", border=1)
-        pdf.cell(50, 10, txt="Name", border=1)
-        pdf.cell(50, 10, txt="Email", border=1)
-        pdf.cell(30, 10, txt="Phone", border=1)
-        pdf.ln()
-
-        # Add user data to the table
-        for user in all_users_data:
-            user_id = user[0]
-            name = user[1] + " " + user[2]
-            email = user[3]
-            phone = user[6]
-
-            pdf.cell(30, 10, txt=str(user_id), border=1)
-            pdf.cell(50, 10, txt=name, border=1)
-            pdf.cell(50, 10, txt=email, border=1)
-            pdf.cell(30, 10, txt=phone, border=1)
-    
-            pdf.ln()
-
-        # Save PDF
-        pdf.output("current_users_report.pdf")
-
-        # Show success message
-        messagebox.showinfo("Success", "Current Users Report Generated Successfully")
-
-        # Show location of PDF
-        messagebox.showinfo("Success", "Current Users Report Generated Successfully at "+os.getcwd())
 
 
 
