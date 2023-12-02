@@ -165,38 +165,30 @@ class View(ctk.CTk):
         self.login_as = tk.StringVar()
         self.login_as.set("Passenger")
         self.driver_radio_button = ctk.CTkRadioButton(self, text="Driver", variable=self.login_as, value="Driver")
-        self.driver_radio_button.pack(side="left", pady=10)
+        self.driver_radio_button.place(relx=0.4, rely=0.3)
 
         self.passenger_radio_button = ctk.CTkRadioButton(self, text="Passenger", variable=self.login_as, value="Passenger")
-        self.passenger_radio_button.pack(side="left", pady=10)
+        self.passenger_radio_button.place(relx=0.55, rely=0.3)
     
 
         phone_extensions = ["+1", "+44", "+91", "+33"]
-        self.phone_extension_combobox = ctk.CTkComboBox(self, values=phone_extensions)
-        self.phone_extension_combobox.pack(pady=10)
+        self.phone_extension_combobox = ctk.CTkComboBox(self, values=phone_extensions,corner_radius=0)
+        self.phone_extension_combobox.place(relx=0.45, rely=0.38)
 
-
-        self.phone_number_label = ctk.CTkLabel(self, text="Phone Number:", fg_color="transparent", font=("Helvetica", 14, "bold"))
-        self.phone_number_label.pack(pady=10)
-
-        self.phone_number_entry = ctk.CTkEntry(self, fg_color="transparent", font=("Helvetica", 14, "bold"))
-        self.phone_number_entry.pack(pady=10)
-
-        self.otp_label = ctk.CTkLabel(self, text="OTP:", fg_color="transparent", font=("Helvetica", 14, "bold"))
-        self.otp_label.pack(pady=10)
-
-        self.otp_entry = ctk.CTkEntry(self, fg_color="transparent", font=("Helvetica", 14, "bold"))
-        self.otp_entry.pack(pady=10)
-
+        self.phone_number_entry = ctk.CTkEntry(self, fg_color="transparent", font=("Helvetica", 14, "bold"),corner_radius=0,placeholder_text="Phone Number")
+        self.phone_number_entry.place(relx=0.45, rely=0.47)
 
         self.send_otp_button = ctk.CTkButton(self, text="Send OTP", command=self.sendOtpRequest, corner_radius=0)
-        self.send_otp_button.pack(pady=10)
+        self.send_otp_button.place(relx=0.45, rely=0.6)
+
+        self.otp_entry = ctk.CTkEntry(self, fg_color="transparent", font=("Helvetica", 14, "bold"),corner_radius=0,placeholder_text="OTP")
+        self.otp_entry.place(relx=0.45, rely=0.7)
 
         self.login_button = ctk.CTkButton(self, text="Login", command=self.verify_login, corner_radius=0)
-        self.login_button.pack(pady=10)
+        self.login_button.place(relx=0.45, rely=0.8)
 
         self.back_button = ctk.CTkButton(self, text="Back", command=self.show_welcome, corner_radius=0)
-        self.back_button.pack(pady=10)
+        self.back_button.place(relx=0.45, rely=0.9)
 
 
 
@@ -222,7 +214,7 @@ class View(ctk.CTk):
 
         # #set grid layout
         # self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
 
         #welcome admin message
         self.welcome_admin_label = ctk.CTkLabel(self, text="Welcome Admin", fg_color="transparent", font=("Helvetica", 20, "bold"))
@@ -237,115 +229,98 @@ class View(ctk.CTk):
         self.notebook.add("Analytical Reports")
         self.notebook.add("Archive Reports")
 
-
-        #Archieve reports tab frame
-        self.archive_reports_frame = ctk.CTkFrame(self.notebook.tab("Archive Reports"), fg_color="transparent", corner_radius=0)
-        self.archive_reports_frame.grid_columnconfigure(0, weight=1)
-
-    
-        #Archieve reports Label
-        self.archive_reports_label = ctk.CTkLabel(self.notebook.tab("Archive Reports"), text="Archive Reports", fg_color="transparent", font=("Helvetica", 20, "bold"))
-        self.archive_reports_label.grid(row=0, column=0,columnspan=3, sticky="nsew", padx=10, pady=10)
-
-        #keep 
-
-        # #notebook inside pdf reports tab
-        # self.pdf_reports_notebook = ctk.CTkTabview(self.archive_reports_frame)
-        # self.pdf_reports_notebook.grid(row=1, column=0,columnspan=4, sticky="nsew")
-
-        # #add tabs   
-        # self.pdf_reports_notebook.add("Rides Reports")
-        # self.pdf_reports_notebook.add("Confirmed Rides Reports")
-        # self.pdf_reports_notebook.add("Users Reports")
+        #notebook inside pdf reports tab
+        self.pdf_reports_notebook = ctk.CTkTabview(self.notebook.tab("Archive Reports"))
+        self.pdf_reports_notebook.pack(fill="both", expand=True)
+        #add tabs   
+        self.pdf_reports_notebook.add("Rides Reports")
+        self.pdf_reports_notebook.add("Confirmed Rides Reports")
+        self.pdf_reports_notebook.add("Users Reports")
 
         #Analytical reports fm
 
-        # #rides table in rides reports tab
-        # #rides headers
-        # rides_headers = [["Ride ID", "Driver Name", "From Location", "To Location", "Date", "Start Time","Available Seats"]]
-        # #table data
-        # self.rides_table_data = rides_headers
+        #rides table in rides reports tab
+        #rides headers
+        rides_headers = [["Ride ID", "Driver Name", "From Location", "To Location", "Date", "Start Time","Available Seats"]]
+        #table data
+        self.rides_table_data = rides_headers
 
-        # #insert rideid, driver name, from location, to location, date, time and available seats in table_data
-        # for ride in self.display_rides_data:
-        #     self.rides_table_data.append([ride[0],ride[2],ride[3],ride[4],ride[5],ride[6],ride[7]])
-        # #table frame
-        # self.rides_table_frame = ctk.CTkScrollableFrame(self.pdf_reports_notebook.tab("Rides Reports"), fg_color="transparent", corner_radius=0)
-        # self.rides_table_frame.grid(row=0, column=0, columnspan=5, sticky="nsew", padx=10, pady=10)
+        #insert rideid, driver name, from location, to location, date, time and available seats in table_data
+        for ride in self.display_rides_data:
+            self.rides_table_data.append([ride[0],ride[2],ride[3],ride[4],ride[5],ride[6],ride[7]])
+        #table frame
+        self.rides_table_frame = ctk.CTkScrollableFrame(self.pdf_reports_notebook.tab("Rides Reports"), fg_color="transparent", corner_radius=0,width=700,height=450)
+        self.rides_table_frame.pack(fill="both", expand=True)
 
-        # #table
-        # self.rides_table= ctkTable.CTkTable(self.rides_table_frame,values=self.rides_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
-        # self.rides_table.edit_row(0,text_color="blue",hover_color="light blue")
-        # self.rides_table.grid(sticky="nsew", padx=10, pady=10)
+        #table
+        self.rides_table= ctkTable.CTkTable(self.rides_table_frame,values=self.rides_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
+        self.rides_table.edit_row(0,text_color="blue",hover_color="light blue")
+        self.rides_table.pack(fill="both", expand=True)
 
-        # #confirmed rides table in confirmed rides reports tab
-        # #confirmed rides headers
-        # confirmed_rides_headers = [["Ride ID", "User Name", "From Location", "To Location", "Date", "Start Time","Seats Booked"]]
-        # #table data
-        # self.confirmed_rides_table_data = confirmed_rides_headers
+        #confirmed rides table in confirmed rides reports tab
+        #confirmed rides headers
+        confirmed_rides_headers = [["Ride ID", "User Name", "From Location", "To Location", "Date", "Start Time","Seats Booked"]]
+        #table data
+        self.confirmed_rides_table_data = confirmed_rides_headers
 
-        # #get all confirmed rides
-        # #get rideid, userid, seats booked
-        # #get user name from userid
-        # #get ride details from rideid
+        #get all confirmed rides
+        #get rideid, userid, seats booked
+        #get user name from userid
+        #get ride details from rideid
 
-        # #insert rideid, user name, from location, to location, date, time and seats booked in table_data
-        # for ride in self.display_confirmed_rides_data:
-        #     self.confirmed_rides_table_data.append([ride[0],ride[1],ride[2],ride[3],ride[4],ride[5],ride[6]])           
+        #insert rideid, user name, from location, to location, date, time and seats booked in table_data
+        for ride in self.display_confirmed_rides_data:
+            self.confirmed_rides_table_data.append([ride[0],ride[1],ride[2],ride[3],ride[4],ride[5],ride[6]])           
 
-        # #table frame
-        # self.confirmed_rides_table_frame = ctk.CTkScrollableFrame(self.pdf_reports_notebook.tab("Confirmed Rides Reports"), fg_color="transparent", corner_radius=0)
-        # self.confirmed_rides_table_frame.grid(row=0, column=0, columnspan=5, sticky="nsew", padx=10, pady=10)
+        #table frame
+        self.confirmed_rides_table_frame = ctk.CTkScrollableFrame(self.pdf_reports_notebook.tab("Confirmed Rides Reports"), fg_color="transparent", corner_radius=0,width=700,height=400)
+        self.confirmed_rides_table_frame.pack(fill="both", expand=True)
         
-        # #table
-        # self.confirmed_rides_table= ctkTable.CTkTable(self.confirmed_rides_table_frame,values=self.confirmed_rides_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
-        # self.confirmed_rides_table.edit_row(0,text_color="blue",hover_color="light blue")
+        #table
+        self.confirmed_rides_table= ctkTable.CTkTable(self.confirmed_rides_table_frame,values=self.confirmed_rides_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
+        self.confirmed_rides_table.edit_row(0,text_color="blue",hover_color="light blue")
 
-        # self.confirmed_rides_table.grid(sticky="nsew", padx=10, pady=10)
+        self.confirmed_rides_table.pack(fill="both", expand=True)
+        #users table in users reports tab
+        #users headers
+        users_headers = [["User ID", "First Name", "Last Name", "Phone Number", "Email"]]
+        #table data
+        self.users_table_data = users_headers
 
-        # #users table in users reports tab
-        # #users headers
-        # users_headers = [["User ID", "First Name", "Last Name", "Phone Number", "Email"]]
-        # #table data
-        # self.users_table_data = users_headers
+        #insert userid, first name, last name, phone number and email in table_data
+        for user in self.controller.get_all_users():
+            self.users_table_data.append([user[0],user[1],user[2],user[3],user[4]])
 
-        # #insert userid, first name, last name, phone number and email in table_data
-        # for user in self.controller.get_all_users():
-        #     self.users_table_data.append([user[0],user[1],user[2],user[3],user[4]])
+        #table frame
+        self.users_table_frame = ctk.CTkScrollableFrame(self.pdf_reports_notebook.tab("Users Reports"), fg_color="transparent", corner_radius=0,width=700,height=400)
+        self.users_table_frame.pack(fill="both", expand=True)
 
-        # #table frame
-        # self.users_table_frame = ctk.CTkScrollableFrame(self.pdf_reports_notebook.tab("Users Reports"), fg_color="transparent", corner_radius=0)
-        # self.users_table_frame.grid(row=0, column=0, columnspan=5, sticky="nsew", padx=10, pady=10)
+        #table
+        self.users_table= ctkTable.CTkTable(self.users_table_frame,values=self.users_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
+        self.users_table.edit_row(0,text_color="blue",hover_color="light blue")
+        self.users_table.pack(fill="both", expand=True)
 
-        # #table
-        # self.users_table= ctkTable.CTkTable(self.users_table_frame,values=self.users_table_data,colors=["SkyBlue1","SkyBlue2"],header_color="white")
-        # self.users_table.edit_row(0,text_color="blue",hover_color="light blue")
-        # self.users_table.grid(sticky="nsew", padx=10, pady=10)
+        #print as pdf button in all tabs
+        self.print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Rides Reports"), text="Print as PDF",command=self.get_all_rides_reports)
+        self.print_as_pdf_button.pack()
 
-        # #print as pdf button in all tabs
-        # self.print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Rides Reports"), text="Print as PDF",command=self.get_all_rides_reports)
-        # self.print_as_pdf_button.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        self.print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Confirmed Rides Reports"), text="Print as PDF",command=self.get_all_confirmed_rides_reports)
+        self.print_as_pdf_button.pack()
 
-        # self.print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Confirmed Rides Reports"), text="Print as PDF",command=self.get_all_confirmed_rides_reports)
-        # self.print_as_pdf_button.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
-
-        # self.print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Users Reports"), text="Print as PDF",command=self.get_all_users_reports)
-        # self.print_as_pdf_button.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
-
-        #rides reports frame
-        #logout button
+        self.print_as_pdf_button = ctk.CTkButton(self.pdf_reports_notebook.tab("Users Reports"), text="Print as PDF",command=self.get_all_users_reports)
+        self.print_as_pdf_button.pack()
+        # rides reports frame
+        # logout button
         self.logout_button = ctk.CTkButton(self, text="Logout",command=self.show_welcome)
-        self.logout_button.grid(row=6, column=0, sticky="nsew", padx=10, pady=10)
+        self.logout_button.place(relx=0.435, rely=0.9)
 
 
     def home_page(self):
         self.clear_content()
         self.geometry("1050x600")
 
-
         #store current user name
         # self.current_user_object = self.controller.get_current_user_object()
-
 
         #set grid layout
         self.grid_rowconfigure(0, weight=1)
@@ -518,11 +493,6 @@ class View(ctk.CTk):
         #create trip details label
         self.trip_details_label = ctk.CTkLabel(self.frame["trip_details"], text="Trip Details", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.trip_details_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
-
-
-    
-
-
 
         #current ride name and count of active rides
         self.current_user_name = self.current_user_object[1]+" "+self.current_user_object[2]
