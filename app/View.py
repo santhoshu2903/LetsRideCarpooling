@@ -236,13 +236,20 @@ class View(ctk.CTk):
         self.analytical_reports_frame = ctk.CTkFrame(self.notebook.tab("Analytical Reports"),fg_color="transparent", corner_radius=0,width=700,height=500)
         self.analytical_reports_frame.pack(fill="both", expand=True)
 
+        #rides per day image
+        rides_per_day = ctk.CTkImage(light_image=Image.open("Analytical reports/Rides_per_day.png"),dark_image=Image.open("Analytical reports/Rides_per_day.png"),size=(700,200))
+        self.rides_per_day_label = ctk.CTkLabel(self.analytical_reports_frame, image=rides_per_day,text="")
+        self.rides_per_day_label.place(relx=0.5, rely=0.1, anchor="center")
+
+
+
         #Most booked location Label
         self.most_booked_locations_label = ctk.CTkLabel(self.analytical_reports_frame, text="Most Booked Locations", fg_color="transparent", font=("Helvetica", 20, "bold"))
-        self.most_booked_locations_label.place(relx=0.5, rely=0.1, anchor="center")
+        self.most_booked_locations_label.place(relx=0.5, rely=0.5, anchor="center")
 
         most_booked_locations = ctk.CTkImage(light_image=Image.open("Analytical reports/Most_booked_locations.png"),dark_image=Image.open("Analytical reports/Most_booked_locations.png"),size=(700,200))
         self.most_booked_locations_label = ctk.CTkLabel(self.analytical_reports_frame, image=most_booked_locations,text="")
-        self.most_booked_locations_label.place(relx=0.37, rely=0.8, anchor="center")
+        self.most_booked_locations_label.place(relx=0.5, rely=0.8, anchor="center")
 
 
         #notebook inside pdf reports tab
