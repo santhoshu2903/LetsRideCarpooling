@@ -2,7 +2,7 @@ import csv
 from datetime import datetime
 import itertools
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import IntVar, messagebox
 # import ttkbootstrap as tb
 import customtkinter as ctk
 from matplotlib.figure import Figure
@@ -23,7 +23,9 @@ class View(ctk.CTk):
         self.title("Let's Go Ride with US")
         # self.iconphoto(False, tk.PhotoImdsage(file='images/icon.jpg'))
         self.controller = Controller.Controller()
-        self.Ans=Ans.RideSharingAnalysis(self)
+        self.Ans=Ans.LetsRideAnalysis(self)
+        self.title("Let's Go Ride with US")
+
         self.pull_table_data()
         self.show_welcome()
         ctk.set_appearance_mode("light")
@@ -93,8 +95,6 @@ class View(ctk.CTk):
                 self.temp_confirmed_rides_data.append([ride[1],driver_name,from_location,to_location,date,time,ride[3]])
 
             self.display_confirmed_rides_data = self.temp_confirmed_rides_data
-
-
 
 
 
@@ -230,6 +230,20 @@ class View(ctk.CTk):
         #add tabs
         self.notebook.add("Analytical Reports")
         self.notebook.add("Archive Reports")
+
+
+        #frame for analytical reports tab
+        self.analytical_reports_frame = ctk.CTkFrame(self.notebook.tab("Analytical Reports"),fg_color="transparent", corner_radius=0,width=700,height=500)
+        self.analytical_reports_frame.pack(fill="both", expand=True)
+
+        #Most booked location Label
+        self.most_booked_locations_label = ctk.CTkLabel(self.analytical_reports_frame, text="Most Booked Locations", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.most_booked_locations_label.place(relx=0.5, rely=0.1, anchor="center")
+
+        most_booked_locations = ctk.CTkImage(light_image=Image.open("Analytical reports/Most_booked_locations.png"),dark_image=Image.open("Analytical reports/Most_booked_locations.png"),size=(700,200))
+        self.most_booked_locations_label = ctk.CTkLabel(self.analytical_reports_frame, image=most_booked_locations,text="")
+        self.most_booked_locations_label.place(relx=0.37, rely=0.8, anchor="center")
+
 
         #notebook inside pdf reports tab
         self.pdf_reports_notebook = ctk.CTkTabview(self.notebook.tab("Archive Reports"))
@@ -410,21 +424,13 @@ class View(ctk.CTk):
         self.dashboard_label = ctk.CTkLabel(self.frame["dashboard"], text="Dashboard", fg_color="transparent", font=("Helvetica", 20, "bold"))
         self.dashboard_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
-        # #create frame for dashboard reports
-        # self.dashboard_reports_frame = ctk.CTkFrame(self.frame["dashboard"],fg_color="transparent", corner_radius=0)
-        # self.dashboard_reports_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        #display dashboard from Analytical reports
+        
+        most_booked_locations = ctk.CTkImage(light_image=Image.open("Analytical reports/Most_booked_locations.png"),dark_image=Image.open("Analytical reports/Most_booked_locations.png"),size=(700,200))
+        self.most_booked_locations_label = ctk.CTkLabel(self.frame["dashboard"], image=most_booked_locations,text="")
+        self.most_booked_locations_label.place(relx=0.5, rely=0.7, anchor="center")
 
-        # self.figure=self.Ans.plot_rides_day()
-        # if self.figure is not None:
-        #     self.canvas = FigureCanvasTkAgg(self.figure, master=self.frame["dashboard"])
-        #     self.canvas.draw()
-        #     self.canvas_widget = self.canvas.get_tk_widget()
-        #     self.canvas_widget.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
 
-        #image
-        self.image = ctk.CTkImage(light_image=Image.open("images/welcome.jpg"),dark_image=Image.open("images/welcome.jpg"),size=(700,600))
-        self.image_label = ctk.CTkLabel(self.frame["dashboard"], image=self.image)
-        self.image_label.place(x=0,y=0)
 
 
         #create search for ride frame as frame["search_for_ride"]
@@ -748,8 +754,16 @@ class View(ctk.CTk):
             self.feedback_table_selector = CTkTableRowSelector(self.feedback_table)
 
             #Give Feedback button
-            self.give_feedback_button = ctk.CTkButton(self.frame["feedback"], text="Give Feedback",command=self.passenger_give_feedback)
+            self.give_feedback_button = ctk.CTkButton(self.frame["feedback"], text="Give Feedback",command=self.give_feedback)
             self.give_feedback_button.grid(row=2, column=0, sticky="w", padx=10, pady=10)
+
+            #create give feedback frame as frame["give_feedback"]
+            self.frame["give_feedback"] = ctk.CTkFrame(self,fg_color="transparent", corner_radius=0)
+            self.frame["give_feedback"].columnconfigure(1, weight=1)
+
+            #create give feedback label
+            self.give_feedback_label = ctk.CTkLabel(self.frame["give_feedback"], text="Give Feedback", fg_color="transparent", font=("Helvetica", 20, "bold"))
+            self.give_feedback_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
         if self.login_as.get() == "Driver":
             #my rides headers
@@ -776,7 +790,7 @@ class View(ctk.CTk):
             self.feedback_table_selector = CTkTableRowSelector(self.feedback_table)
 
             #Give Feedback button
-            self.give_feedback_button = ctk.CTkButton(self.frame["feedback"], text="Give Feedback",command=self.rider_give_feedback)
+            self.give_feedback_button = ctk.CTkButton(self.frame["feedback"], text="Give Feedback",command=self.give_feedback)
             self.give_feedback_button.grid(row=2, column=0, sticky="w", padx=10, pady=10)
 
 
@@ -1112,18 +1126,141 @@ class View(ctk.CTk):
 
     
 
+    #passenger_give_feedback
+    def give_feedback(self):
+        # show give feedback frame
+        self.show_home_page_frame("give_feedback")
 
-    #rider_give_feedback
-    def rider_give_feedback(self):
-    
-        #get index ctktable row selector
+        # get index ctktable row selector
         self.current_ride_data = self.feedback_table_selector.get()
         # print(self.current_ride_data)
 
+        # check if current ride data is empty
+        if self.current_ride_data == []:
+            messagebox.showerror("Error", "Please select a ride")
+            return
 
-    #passenger_give_feedback
-    def passenger_give_feedback(self):
+        # from_location = self.controller.get_locationid_by_location_name(self.current_ride_data[0][1])
+        # to_location = self.controller.get_locationid_by_location_name(self.current_ride_data[0][2])
+        date = self.current_ride_data[0][3]
+        # date string to date object
+        date = datetime.strptime(date, '%m/%d/%Y').date()
+
+        time = self.current_ride_data[0][4]
+
+        # string to time object
+        time = datetime.strptime(time, '%I:%M %p').time()
+
+        # #get rideid from selected row
+        # rideid =self.controller.get_rideid_by_drivername_from_locationid_to_locationid_date_time(self.current_ride_data[0][0],from_location,to_location,date,time)
+        # userid = self.current_user_object[0]
+
+        # #check if feedback is already given
+        # if self.check_if_feedback_is_given_by_userid_and_rideid(userid,rideid):
+        #     messagebox.showerror("Error", "Feedback is already given for this ride")
+        #     return
+
+        # Driver Name label and entry side by side
+        self.driver_name_label = ctk.CTkLabel(self.frame["give_feedback"], text="Driver Name : ", fg_color="transparent",
+                                              font=("Helvetica", 14, "bold"))
+        self.driver_name_label.grid(row=1, column=0, sticky="e", padx=10, pady=10)
+
+        self.driver_name_entry = ctk.CTkLabel(self.frame["give_feedback"], text=self.current_ride_data[0][0],
+                                              fg_color="transparent", font=("Helvetica", 14, "bold"))
+        self.driver_name_entry.grid(row=1, column=1, sticky="w", padx=10, pady=10)
+
+        # create a frame for rating radio buttons
+        rating_frame = ctk.CTkFrame(self.frame["give_feedback"])
+        rating_frame.grid(row=2, column=0, columnspan=6, padx=10, pady=10)
+
+        #columnconfigure
+        rating_frame.columnconfigure(0, weight=1)
+
+        # rating radio buttons
+        self.rating_label = ctk.CTkLabel(rating_frame, text="Rating : ", fg_color="transparent",
+                                         font=("Helvetica", 14, "bold"))
+        self.rating_label.grid(row=0, column=0, sticky="e", padx=10, pady=10)
+
+        self.rating = IntVar()
+
+        self.rating_radio_button_1 = ctk.CTkRadioButton(rating_frame, text="Very Bad", variable=self.rating, value=1)
+        self.rating_radio_button_1.grid(row=0, column=1, sticky="w", padx=10, pady=10)
+
+        self.rating_radio_button_2 = ctk.CTkRadioButton(rating_frame, text="Bad", variable=self.rating, value=2)
+        self.rating_radio_button_2.grid(row=0, column=2, sticky="w", padx=10, pady=10)
+
+        self.rating_radio_button_3 = ctk.CTkRadioButton(rating_frame, text="Good", variable=self.rating, value=3)
+        self.rating_radio_button_3.grid(row=0, column=3, sticky="w", padx=10, pady=10)
+
+        self.rating_radio_button_4 = ctk.CTkRadioButton(rating_frame, text="Great", variable=self.rating, value=4)
+        self.rating_radio_button_4.grid(row=0, column=4, sticky="w", padx=10, pady=10)
+
+        self.rating_radio_button_5 = ctk.CTkRadioButton(rating_frame, text="Excellent", variable=self.rating, value=5)
+        self.rating_radio_button_5.grid(row=0, column=5, sticky="w", padx=10, pady=10)
+
+        self.rating = IntVar()
+
+        self.rating_radio_button_1 = ctk.CTkRadioButton(self.frame["give_feedback"], text="Very Bad", variable=self.rating, value=1)
+        self.rating_radio_button_1.grid(row=2, column=1, sticky="w", padx=10, pady=10)
+
+        self.rating_radio_button_2 = ctk.CTkRadioButton(self.frame["give_feedback"], text="Bad", variable=self.rating, value=2)
+        self.rating_radio_button_2.grid(row=2, column=2, sticky="w", padx=10, pady=10)
+
+        self.rating_radio_button_3 = ctk.CTkRadioButton(self.frame["give_feedback"], text="Good", variable=self.rating, value=3)
+        self.rating_radio_button_3.grid(row=2, column=3, sticky="w", padx=10, pady=10)
+
+        self.rating_radio_button_4 = ctk.CTkRadioButton(self.frame["give_feedback"], text="Great", variable=self.rating, value=4)
+        self.rating_radio_button_4.grid(row=2, column=4, sticky="w", padx=10, pady=10)
+
+        self.rating_radio_button_5 = ctk.CTkRadioButton(self.frame["give_feedback"], text="Excellent", variable=self.rating, value=5)
+        self.rating_radio_button_5.grid(row=2, column=5, sticky="w", padx=10, pady=10)
+
+        #feedback label
+
+
+
+        
+        #create feedback label
+        self.feedback_label = ctk.CTkLabel(self.frame["give_feedback"], text="Feedback", fg_color="transparent", font=("Helvetica", 20, "bold"))
+        self.feedback_label.grid(row=3, column=0, sticky="nsew", padx=10, pady=10)
+
+        #create feedback entry
+        self.feedback_entry = ctk.CTkEntry(self.frame["give_feedback"], fg_color="transparent", font=("Helvetica", 14, "bold"),width=300)
+        self.feedback_entry.grid(row=3, column=1, sticky="nsew", padx=10, pady=10)
+
+        #create submit button
+        self.submit_button = ctk.CTkButton(self.frame["give_feedback"], text="Submit",command=self.submit_feedback)
+        self.submit_button.grid(row=3, column=0, sticky="nsew", padx=10, pady=10)
+
+    #submit_feedback
+    def submit_feedback(self):
+
+        #MessageBox
+        #feedback is submitted successfully
+        messagebox.showinfo("Success", "Feedback submitted successfully")
+
+        #show dashboard frame as default frame
+
+        #set feedback frame as default frame
+        self.show_home_page_frame("feedback")
         pass
+        # #insert feedback in database
+        # try:
+        #     self.controller.insert_feedback(self.current_user_object[0],self.current_ride_data[0][1],self.rating.get(),self.feedback_entry.get())
+        #     messagebox.showinfo("Success", "Feedback submitted successfully")
+        #     self.show_home_page_frame("feedback")
+        # except Exception as e:
+        #     messagebox.showerror("Error", "Error while submitting feedback")
+        #     #print(e)
+        #     return
+        
+        # #show dashboard frame as default frame
+        # self.home_page()
+
+        # #set feedback frame as default frame
+        # self.show_home_page_frame("feedback")
+
+
 
     #show_passenger_details
     def show_passenger_details(self):
@@ -1162,8 +1299,6 @@ class View(ctk.CTk):
         #create back button to dashboard frame
         self.back_button = ctk.CTkButton(self.frame["passenger_details"], text="Back",command=lambda: self.show_home_page_frame("give_ride"))
         self.back_button.grid(row=4, column=0, sticky="w", padx=10, pady=10)
-
-    
 
 
     def confirm_ride_page(self):
@@ -2324,8 +2459,7 @@ class View(ctk.CTk):
             self.admin =True
             self.pull_table_data()
             self.admin_page()
-            #welcome admin message
-            messagebox.showinfo("Success", "Welcome Admin")
+
             return
        
         self.current_user_phone_number =  self.phone_extension_combobox.get()+self.phone_number_entry.get()

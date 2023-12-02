@@ -111,7 +111,20 @@ class Model:
                 FOREIGN KEY (userid) REFERENCES users(userid)
             );
         ''')
-
+        
+        #create feedback table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS feedback (
+                feedbackid INT AUTO_INCREMENT PRIMARY KEY,
+                userid INT NOT NULL,
+                rideid INT NOT NULL,
+                rating INT NOT NULL,
+                comment VARCHAR(255) NOT NULL,
+                FOREIGN KEY (userid) REFERENCES users(userid),
+                FOREIGN KEY (rideid) REFERENCES rides(rideid)
+            );
+        ''')
+        
         #add database name to the dictionary
         conn.close()
 

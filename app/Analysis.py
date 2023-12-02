@@ -18,7 +18,6 @@ class LetsRideAnalysis:
         self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
 
         self.plot_rides_day()
-        self.plot_rides_hour()
         self.most_booked_locations()
 
     def plot_rides_day(self):
@@ -34,7 +33,9 @@ class LetsRideAnalysis:
                 return None
             
             day, rides = zip(*data.values)
-            self.figure.clear()
+            self.figure = Figure(figsize=(20, 4), dpi=60)
+            # Canvas to display the figure
+            self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
 
             ax = self.figure.add_subplot(111)
             ax.bar(day, rides)
@@ -70,8 +71,9 @@ class LetsRideAnalysis:
             
             location, rides = zip(*data.values)
 
-            # Clear the figure
-            self.figure.clear()
+            self.figure = Figure(figsize=(20, 4), dpi=60)
+            # Canvas to display the figure
+            self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
             ax = self.figure.add_subplot(111)
             ax.bar(location,rides)
             # Set the title
@@ -94,3 +96,39 @@ class LetsRideAnalysis:
             # Handle exceptions and show an error message
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
             return None
+
+    def plot_rides_month(self):
+        try:
+            # Get rides data per month from model
+            data = self.model.get_rides_per_month()
+
+            if not isinstance(data, pd.DataFrame):
+                data = pd.DataFrame(data)
+
+            if data.empty:
+                messagebox.showinfo("No Data", "No ride data available for analysis.")
+                return None
+            
+            month, rides = zip(*data.values)
+            self.figure.clear()
+
+            ax = self.figure.add_subplot(111)
+            ax.bar(month, rides)
+            ax.set_title('Rides per month')
+            ax.set_xlabel('Month')
+            ax.set_ylabel('Rides')
+
+            self.canvas.draw()
+            self.canvas.get_tk_widget().pack()
+
+            #save as image
+            self.figure.savefig('Analytical reports/Rides_per_month.png', bbox_inches='tight')
+
+            # Return the canvas for additional use if needed
+            return self.figure
+
+        except Exception as e:
+            # Handle exceptions and show an error message
+            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+            return None
+
